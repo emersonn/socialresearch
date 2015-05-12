@@ -1,0 +1,60 @@
+Dependencies: tweepy, sqlalchemy, mysql-python, colorama, textblob
+  python -m textblob.download_corpora
+
+Crawling Instagram
+  - Take a look at the popular page for a particular location
+    - Record each step through the photos and the person who has the photos
+      - Record each comment, likes
+  - "You cannot use the Instagram API to crawl or store users' media without their express consent."
+    - Maybe ask around and for permission to label someone's Instagram ideals? It gives them
+      a personality? Make it into a viral site to ask what their Instagram is and gives them
+      stats about themselves?
+      - Take a look at their captions, hashtags, comments, likes, emojis used?
+        - Counts of emojis, average, standard deviaions?
+        - Most liked comments, most commented pictures, most liked pictures, most expressive hashtags?
+      - Maybe get other American students to rate the American's personalities and how outgoing they are?
+        On a scale of 1 to 10 how revealing is this picture? How much can you tell from this picture?
+        How much emotion does this express?
+        - Elo scale on how crazy the picture is? Maybe focus on one thing? How much emotions is this? Swipe
+          left or swipe right?
+          - What kind of emotion does this picture express? Happy, sad, nothing?
+
+Crawling Twitter
+  - API.trends_place() of Germany and places around the United States
+    - What do people most talk about? What about their opinions on Fergueson or something? What are their
+      emotions? What type of hashtags do they use? What do their friends tweet about?
+    - API.search()
+    - Sentiment analysis with text classification? NLTK Python? What kind of hashtags do people use in addition
+      to the sentiment analysis? text-processing.com
+
+  - Crawling
+    - Get the trends. Store as a Trend model with a particular date.
+      - Store tweets that follow the trend at that exact time, ~1000.
+      - Trends will point to all the Tweets that relate to it.
+      - Eventually crawl the tweets and the users that are in the tweets?
+        - Have a user object and analyze their personality in the database.
+
+  - Workflow
+    - Crawler to populate database with trends, tweets
+      - Analyze the trends by looking at most popular trends?
+    - Analysis of Tweets
+      - Sentiment analysis of tweets to populate database of understanding NLTK
+      - Analyze positive/negative sentiment, most common words for particular users
+        how much information they share, the location, the places they eat, the emojis they use?
+    - Participation in Trends? Especially controversial trends?
+    - Need another crawler that takes the streaming API of a particular place and just stores those tweets without trends
+
+  - Analysis
+    - Happy/sad? Share personal information (pronouns present)?
+      - Textblob and nltk
+        - Classify maybe different stats with positive, negative and then combine the distributions of each to
+          get a general idea of the particular tweet
+            - Sentiment, personal information, can you tell who this person is from this tweet, are they talking about/to
+              someone (personal conversation)
+    - 3 string columns with pos/neg or however many classifiers there need to be and 3 classifier columns
+      with the probability distributions. Then have a script that allows classification by column because now
+      rows without classifications can then be classified.
+
+- Notes:
+  - python -m socialresearch.twitter.crawl_trends
+  - python -m socialresearch.twitter.crawl_stream
