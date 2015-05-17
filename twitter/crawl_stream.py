@@ -35,7 +35,7 @@ class TweetStreamListener(tweepy.StreamListener):
         print("Successfully connected to Twitter streaming API...")
 
     def on_status(self, status):
-        print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text.encode('unicode-escape') + Fore.RESET)
+        print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text.encode('utf-8') + Fore.RESET)
 
         try:
             longitude = status.coordinates['coordinates'][0]
