@@ -39,7 +39,8 @@ class TweetStreamListener(tweepy.StreamListener):
             print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text + Fore.RESET)
         except UnicodeEncodeError:
             # TODO: fix this, very hacky workaround to run on server
-            print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text.encode('ascii', 'ignore').decode('ascii') + Fore.RESET)
+            # print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text.encode('ascii', 'ignore').decode('ascii') + Fore.RESET)
+            print("Got tweet " + str(status.id_str))
 
         try:
             longitude = status.coordinates['coordinates'][0]
