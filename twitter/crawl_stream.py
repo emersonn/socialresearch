@@ -48,6 +48,8 @@ class TweetStreamListener(tweepy.StreamListener):
             place = status.place.full_name
         except TypeError:
             place = "Undefined"
+        except AttributeError:
+            place = "Undefined"
 
         try:
             store_tweet = models.Tweet(text = str(status.text.encode('unicode_escape')),
@@ -83,5 +85,15 @@ if __name__ == '__main__':
 
 
     # stream.filter(locations = [13.09, 52.34, 13.76, 52.68, -122.44, 47.50, -122.24, 47.73])
-    stream.filter(locations = locations)
+    # TODO: Very hacky. Make it so it doesn't use a while loop and try, except. Also include in logging.
+    import sqlalchemy
+    while 1:
+        try:
+            print(Fore.RED + "Starting Twitter stream..." + Fore.RESET)
+            stream.filter(locations = locations)
+        except UnicodeDecodeError:
+            pass
+        except sqlalchemy.exc.DataError:
+            pass
+
     # stream.filter(track=['penis'])

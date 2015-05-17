@@ -21,12 +21,16 @@ def classify(classification):
     cl = NaiveBayesClassifier(train)
 
     testing = db_session.query(models.Tweet).filter_by(**{classification + "_classify": None}).all()
+    # show accuracy of test set?
+    # print("Getting accuracy of " + str(cl.accuracy(testing)))
+
+    cl.show_informative_features(10)
 
     print("Printing the " + classification + " classifications...")
 
-    for response in testing[100:120]:
+    for response in testing[100:200]:
         print(response.text)
-        print(cl.classify(response.text) + " " + str(cl.prob_classify(response.text).prob(cl.classify(response.text))))
+        print(cl.classify(response.text) + " " + str(cl.prob_classify(response.text).prob("pos")))
 
 if __name__ == "__main__":
     for classification in CLASSIFICATIONS:
