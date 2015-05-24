@@ -22,7 +22,11 @@ ACCESS_SECRET = "Ez00jB4IDK3mQQqsVPjtROOQL95LzjsTuuqIRghwLClJB"
 LOCATIONS = (('berlin', (13.09, 52.34, 13.76, 52.68)),
              ('seattle', (-122.44, 47.50, -122.24, 47.73)),
              ('los_angeles', (-118.67, 33.70, -118.16, 34.34)),
-             ('new_york', (-74, 40, -73, 41)))
+             ('new_york', (-74, 40, -73, 41)),
+             ('hanover', (9.61, 52.31, 9.92, 52.45)),
+             ('jena', (11.54, 50.88, 11.63, 50.97)),
+             ('frankfurt', (8.47, 50.02, 8.79, 50.23)),
+             ('stuttgart', (9.03, 48.68, 9.31, 48.86)))
 
 # TODO: find a good place for this? maybe this might belong somewhere else?
 AUTH = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
