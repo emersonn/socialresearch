@@ -11,6 +11,7 @@ CLASSIFICATIONS = ['sentiment', 'personal', 'convo', 'know']
 # and classify all of them by putting data into the _dist field
 
 def classify(classification):
+    # TODO: Fix this so it paginates through the results
     response_pos = db_session.query(models.Tweet).filter_by(**{classification + "_classify": "pos"}).all()
     response_neg = db_session.query(models.Tweet).filter_by(**{classification + "_classify": "neg"}).all()
 
@@ -20,7 +21,7 @@ def classify(classification):
 
     cl = NaiveBayesClassifier(train)
 
-    testing = db_session.query(models.Tweet).filter_by(**{classification + "_classify": None}).all()
+    testing = db_session.query(models.Tweet).filter_by(**{classification + "_classify": None}).limit(100)
     # show accuracy of test set?
     # print("Getting accuracy of " + str(cl.accuracy(testing)))
 

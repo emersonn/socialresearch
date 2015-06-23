@@ -40,15 +40,19 @@ class Tweet(Base):
     sentiment_dist = Column(Float)
 
     # does the user share any personal information in the tweet?
+    # REVISED: does this person share any personal information about their culture?
     personal_classify = Column(String(10))
     personal_dist = Column(Float)
 
     # is this person having a conversation with another person in this tweet
     # or directly talking about another person? using names, etc
+    # REVISED: is this person engaging in an active conversation with others about their
+    # culture?
     convo_classify = Column(String(10))
     convo_dist = Column(Float)
 
     # do you feel like you know this person through this tweet? can you tell what
     # type of person they are?
+    # REVISED: do you feel like you know where this person originates from?
     know_classify = Column(String(10))
     know_dist = Column(Float)

@@ -10,7 +10,8 @@ CLASSIFICATIONS = ['sentiment', 'personal', 'convo', 'know']
 def classify(classification):
     # response = db_session.execute('SELECT * FROM tweet WHERE ' + classification + '_classify is NULL')
     current = classification + "_classify"
-    response = db_session.query(models.Tweet).filter_by(**{current: None}).all()
+    # TODO: fix this so it paginates, easy fix
+    response = db_session.query(models.Tweet).filter_by(**{current: None}).limit(100)
 
     for row in response:
         print(Fore.BLUE + "The tweet: " + Fore.RESET + row.text.decode('unicode-escape'))
