@@ -38,7 +38,7 @@ CL = generate_classifier()
 
 def analyze_topic(tweets, place, topic, num_tweets):
     print(Fore.MAGENTA + "There are " + str(len(tweets)) + " " + topic + " tweets in " + place + "." + Fore.RESET)
-    print(Fore.CYAN + "This constitutes " + str(round(len(tweets) * 1.0 / models.Tweet.query.filter_by(place = place).count() * 100)) + "% of " + place + " tweets." + Fore.RESET)
+    print(Fore.CYAN + "This constitutes " + str(round(len(tweets) * 1.0 / models.Tweet.query.filter_by(place = place).count() * 100, 2)) + "% of " + place + " tweets." + Fore.RESET)
 
     print(Fore.RED + "Here are some samples." + Fore.RESET)
     for tweet in random.sample(tweets, min(10, len(tweets))):
