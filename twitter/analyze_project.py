@@ -13,8 +13,9 @@ import models
 LOCATIONS = ('Berlin, Germany', 'Seattle, WA', 'Los Angeles, CA')
 
 # God is sometimes used colloquially and not in a religious context
-CHRISTIAN_KEYWORDS = ('God', 'Bible', 'Jesus', 'Jesus Christ', 'Church')
-MUSLIM_KEYWORDS = ('Koran', "Quran", "Q'uran", "Allah", "Mosque")
+# Amen, Mosque added to new data 6.6.15
+CHRISTIAN_KEYWORDS = ('God', 'Bible', 'Jesus', 'Jesus Christ', 'Church', 'Amen', 'Baptism', 'Christ', 'Holy Easter', 'Easter Sunday', 'Holy Spirit')
+MUSLIM_KEYWORDS = ('Koran', "Quran", "Q'uran", "Allah", "Mosque", 'Allahu Akbar', 'Ramadan', "Jumu'ah")
 
 def generate_classifier():
     print(Fore.GREEN + "Generating classifier..." + Fore.RESET)
