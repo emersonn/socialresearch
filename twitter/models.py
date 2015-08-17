@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Float, BigInteger
+from sqlalchemy import Table, Column, Integer, String, DateTime, Boolean, ForeignKey, Float, BigInteger
 from sqlalchemy.orm import relationship, backref
 
 # from ..database import Base
@@ -16,6 +16,11 @@ class Trend(Base):
     name = Column(String(400))
 
     place = Column(String(400))
+
+association_table = Table('association', Base.metadata,
+    Column('tweet_id', Integer, ForeignKey('tweet.id')),
+    Column('tag_id', Integer, ForeignKey('tag.id'))
+)
 
 class Tweet(Base):
     __tablename__ = 'tweet'
@@ -62,3 +67,11 @@ class Tweet(Base):
     know_dist = Column(Float)
 
     analyzed_date = Column(DateTime)
+
+    tags = relationship('Tag', secondary = association_table, backref = "tweets")
+
+class Tag(Base):
+    __tablename__ = "tag"
+
+    id = Column(Integer, primary_key = True)
+    tag = Column(String(100))
