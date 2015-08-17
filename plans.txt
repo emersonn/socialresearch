@@ -55,6 +55,98 @@ Crawling Twitter
       with the probability distributions. Then have a script that allows classification by column because now
       rows without classifications can then be classified.
 
+  - Website
+    - Fun website that uses the data
+      - Displays the research and findings
+      - Comparison to average twitter user with:
+        - Length of tweets
+        - Most common words in your tweets
+        - Random tweet of yours
+        - Classifications
+          - Sentiment
+            - Most sentimental tweet, positive or negative
+            - Average sentiment, graph of distribution showing where they are
+    - Main page has just a world map and Live updates of tweets from places
+      and has a button that asks if you want to be analyzed and another button
+      that pushes the page down to statistics about the research
+    - Fix all parts that may need updating
+    - Need analytics
+    - AngularJS loads API hook full of statistics and data needed to create graphs
+      - Timer that polls new data every so often
+
+    - Dependencies
+      - Flask
+        - Make sure to fix static file servings
+        - Fix the returns of the random numbers
+        - Should I start caching the user names?
+      - Alembic
+
+    - Need to add comments for literally everything!
+
+    - Person makes call to API -> API looks up in Database for most recent update
+    - Script kept Alive that continuously crunches numbers and keeps numbers updated
+      with new stats and pushes new rows to the database
+
+    - Just cache actually. Update the cache depending on how long the database takes...?
+
+    - Random tweets around the world that pop up on a map
+    - Graph of most common words
+    - Average sentiment towards a certain filter of words
+    - Some type of connection map, words that are commonly found with other words look at NLTK examples
+    - Most common words in most common places
+    - What types of things do people talk about when they talk about religion?
+      - Common words found with religion
+      - People who talk about religion what do they talk about?
+      - Direct messages to other people what are they talked about?
+
+    - Get tweets that have not been classified with tags, limit to 100, then tag them then keep tagging
+    - Get all tweets for a specified location and classify by a certain group of tags
+      - Get sentiment and all necessary words
+    - Get a random sample of around ~1000 tweets
+      - Get sentiment, tags, etc.
+
+    - Migrate to PostgreSQL instead? Store JSON objects?
+    - Keep track of words and their frequencies
+
+    - Migrate to PostgreSQL with new database. Fix locations or use firehose. Add screen names and
+      other data that may be necessary. Add a SQL migration schema.
+    - Optionally use MongoDB and add to a database based on analysis.
+    - Optionally keep same database, add sql migration schema, change database to what is needed
+      (add screen names, etc)
+
+    - Todo:
+      - Install Alembic (done)
+      - Init Alembic (done)
+      - Remove excess model columns, add necessary columns
+        - Screen names (done), analyzed date (done), better location/place/coordinates (done), tags (religion, etc)
+      - Add the new columns to the stream script
+      - Add new models for words
+        - Frequency
+      - Migrate database
+      - Create script for analysis
+      - Fix stream placement for better location/place/coordinates
+
+
+    - Todo for production:
+      - Install flask, Alembic
+      - Alembic follow setup to generate files, modify .ini, and env.py
+      - Migrate database
+      - Fix state file serving, etc.
+
+
+      - "import sys
+        import os.path
+
+        sys.path.append(os.path.join(os.path.dirname(__file__), '..'))"
+
+    - Do not change files (necessary to change in production):
+      - settings.py, alembic.ini
+
 - Notes:
   - python -m socialresearch.twitter.crawl_trends
   - python -m socialresearch.twitter.crawl_stream
+
+- Important Circus Settings:
+  circusd --daemon socialresearch.ini --log-output social.log --log-level debug --pidfile circus.pid
+  circusctl [status]
+  pkill circusd

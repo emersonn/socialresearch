@@ -2,6 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
+# import twitter.models
 from settings import DATABASE
 
 engine = create_engine(DATABASE, convert_unicode=True)

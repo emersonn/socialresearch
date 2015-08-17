@@ -1,7 +1,10 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, Float, BigInteger
 from sqlalchemy.orm import relationship, backref
 
-from ..database import Base
+# from ..database import Base
+
+from sqlalchemy.ext.declarative import declarative_base
+Base = declarative_base()
 
 class Trend(Base):
     __tablename__ = 'trend'
@@ -21,6 +24,7 @@ class Tweet(Base):
 
     text = Column(String(1000))
     user_id = Column(BigInteger)
+    screen_name = Column(String(100))
     number = Column(BigInteger)
     created_at = Column(DateTime)
 
@@ -56,3 +60,5 @@ class Tweet(Base):
     # REVISED: do you feel like you know where this person originates from?
     know_classify = Column(String(10))
     know_dist = Column(Float)
+
+    analyzed_date = Column(DateTime)
