@@ -4,6 +4,7 @@ from sqlalchemy.orm import relationship, backref
 # from ..database import Base
 
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.hybrid import hybrid_property
 Base = declarative_base()
 
 class Trend(Base):
@@ -20,6 +21,11 @@ class Trend(Base):
 association_table = Table('association', Base.metadata,
     Column('tweet_id', Integer, ForeignKey('tweet.id')),
     Column('tag_id', Integer, ForeignKey('tag.id'))
+)
+
+word_table = Table('word_table', Base.metadata,
+    Column('word_id', Integer, ForeignKey('word.id')),
+    Column('tweet_id', Integer, ForeignKey('tweet.id'))
 )
 
 class Tweet(Base):
@@ -75,3 +81,10 @@ class Tag(Base):
 
     id = Column(Integer, primary_key = True)
     tag = Column(String(100))
+
+class Word(Base):
+    __tablename__ = "word"
+
+    id = Column(Integer, primary_key = True)
+    word = Column(String(1000))
+    context = relationship('Tweet', secondary = word_table, backref = "words")

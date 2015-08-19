@@ -98,6 +98,9 @@ Crawling Twitter
       - Common words found with religion
       - People who talk about religion what do they talk about?
       - Direct messages to other people what are they talked about?
+    - Scatter plot of favorites/retweets and sentiment
+    - Sentiment over a period of time
+      - The past week
 
     - Get tweets that have not been classified with tags, limit to 100, then tag them then keep tagging
     - Get all tweets for a specified location and classify by a certain group of tags
@@ -118,13 +121,19 @@ Crawling Twitter
       - Install Alembic (done)
       - Init Alembic (done)
       - Remove excess model columns, add necessary columns
-        - Screen names (done), analyzed date (done), better location/place/coordinates (done), tags (religion, etc)
-      - Add the new columns to the stream script
-      - Add new models for words
-        - Frequency
-      - Migrate database
-      - Create script for analysis
+        - Screen names (done), analyzed date (done), better location/place/coordinates (done), tags (religion, etc) (done)
+      - Add the new columns to the stream script (done)
+      - Add new models for words (points to tweets?) (done)
+        - Frequency (inherent with pointing to tweets)
+      - Migrate database (done)
+      - Create script for analysis (done)
+        - Filter by date exists, limit by 10,000 and add analysis (done)
+          - Create words of it and add tags and add sentiment analysis (done)
+      - Add more locations for the stream and more evenly distributed (made sample stream)
       - Fix stream placement for better location/place/coordinates
+      - Comment on all new things
+      - Add new categories/tags
+      - Case insensitive matching for categories
 
 
     - Todo for production:
@@ -132,6 +141,8 @@ Crawling Twitter
       - Alembic follow setup to generate files, modify .ini, and env.py
       - Migrate database
       - Fix state file serving, etc.
+      - Classify a few sentiment
+      - Debug is on
 
 
       - "import sys
