@@ -101,6 +101,10 @@ Crawling Twitter
     - Scatter plot of favorites/retweets and sentiment
     - Sentiment over a period of time
       - The past week
+    - Current popular hashtags and sentiment towards those hashtags
+    - Current trends and the sentiment towards the trends
+
+    - Current workflow: crawl_stream to analyze 
 
     - Get tweets that have not been classified with tags, limit to 100, then tag them then keep tagging
     - Get all tweets for a specified location and classify by a certain group of tags

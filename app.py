@@ -2,7 +2,7 @@ import datetime, random
 
 from flask import Flask, jsonify, send_file
 from sqlalchemy import func
-from sqlalchemy.sql.expression import func
+# from sqlalchemy.sql.expression import func
 
 from twitter.models import Tweet, Word, Tag
 from database import db_session
@@ -80,7 +80,25 @@ def words():
             date_sentiment['data'].append(0)
         # strftime ("%A (%D)")
 
-    return jsonify({'word_stats': word_stats, 'date_stats': date_stats, 'date_sentiment': date_sentiment})
+    query = db_session.query(Word).filter(Word.word.contains("#")).join(Word.context).group_by(Word.id).order_by(func.count(Tweet.id).desc()).limit(20).all()
+    hashtag_sentiment = {'labels': [], 'data': []}
+
+    # TODO: Abstract this out
+    for hashtag in query:
+        hashtag_sentiment['labels'].append(hashtag.word[:10])
+
+        tweets = hashtag.context
+        sentiment = 0.0
+
+        for tweet in tweets:
+            if tweet.sentiment_dist != None:
+                sentiment += tweet.sentiment_dist
+        try:
+            hashtag_sentiment['data'].append(sentiment/len(tweets))
+        except ZeroDivisionError:
+            hashtag_sentiment['data'].append(0)
+
+    return jsonify({'word_stats': word_stats, 'date_stats': date_stats, 'date_sentiment': date_sentiment, 'hashtag_sentiment': hashtag_sentiment})
 
 @app.route('/api/religion/')
 def religion():

@@ -170,6 +170,21 @@
                 <h5>What does this sentiment really mean?</h5>
               </div>
             </div>
+
+            <div class="row spaced">
+              <div class="four columns stats" ng-show="initial_stats">
+                <p class="info-text">#sentiment</p>
+                <p>
+                  For the sake of excluding articles and less interesting words, these are all the words
+                  past four characters long. Watch as the data changes as the script continuously takes into
+                  account new Tweets added into the system.
+                </p>
+              </div>
+
+              <div class="eight columns">
+                <canvas id="bar" class="chart chart-bar" data="hashtag_sentiment_data" labels="hashtag_sentiment_labels"></canvas>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -236,6 +251,9 @@
 
               $scope.date_sentiment_labels = data['date_sentiment']['labels'];
               $scope.date_sentiment_data = [data['date_sentiment']['data']];
+
+              $scope.hashtag_sentiment_labels = data['hashtag_sentiment']['labels'];
+              $scope.hashtag_sentiment_data = [data['hashtag_sentiment']['data']];
             }, function(err) {
               console.log("Request did not work for words.");
             });
