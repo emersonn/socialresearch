@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html ng-app='social'>
+  <head>
+    <meta charset="utf-8">
+    <meta content="Culture of Twitter" itemprop="headline">
+    <meta content="Fix this in the future" itemprop="description">
+
+    <link rel ="icon" href="/static/images/favicon.ico?v=1">
+
+    <title>
+      Culture of Twitter
+    </title>
+
+    <link href='http://fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="/static/css/normalize.css">
+    <link rel="stylesheet" href="/static/css/skeleton.css">
+    <link rel="stylesheet" href="/static/css/animate.css">
+    <link rel="stylesheet" href="/static/css/angular-chart.css">
+
+    <style type="text/css">
+      .landing {
+        background: url(/static/images/lips.jpg) no-repeat;
+        background-size: cover;
+
+        color: #FFF;
+
+        height: 300px;
+        padding-top: 36rem;
+      }
+
+      .information {
+        padding: 20rem 0 20rem 0;
+      }
+
+      h6.info-text {
+        font-size: 3.6rem;
+      }
+
+      .info-text {
+        text-transform: uppercase;
+        letter-spacing: .2rem;
+        font-weight: 200;
+      }
+
+      .clear-text {
+        font-weight: 400;
+      }
+
+      .spaced {
+        padding: 5rem 0 5rem 0;
+      }
+
+      .highlight {
+        background-color: #c0392b;
+        color: #FFF;
+      }
+
+      .stats.ng-animate {
+        animation: fadeInDown 1s;
+      }
+    </style>
+
+  </head>
+  <body>
+    <div class="section landing">
+      <div class="container">
+        <center>
+          <h6 class="info-text">People of Twitter</h6>
+          <p class="clear-text">Learn a bit about yourself and the <strong>100 million</strong> people who use this service daily.</p>
+          <a href="#first-info"><button class="button-primary">Explore</button></a>
+        </center>
+      </div>
+    </div>
+
+    <div ng-controller="StatsController">
+      <div id="first-info" class="section information first-info">
+        <div class="container">
+          <div class="row">
+            <div class="four columns">
+              <h5>Did you know that over <strong>400 million</strong> people have at least <i>200</i> followers?</h5>
+            </div>
+            <div class="eight columns">
+              The funny part about Twitter is that we can't say there's an "average" Twitter user. There isn't
+              one person who defines what Twitter is. You can have someone tweeting from the plains of
+              Montana while you have another sharing wedding photos in India. Twitter is a community of vibrant, diverse people who
+              make it difficult to put into categories. This is how it all started. From a curiosity about the
+              world of social media, this started as study abroad project attempts to grasp at what we can call the "culture" of Twitter.
+              Not only that, it strives to understand what lengths this "mind" of Twitter can span.
+            </div>
+          </div>
+
+          <div class="row spaced stats animated" ng-show="initial">
+            <div class="four columns">
+              <center>
+                <h3 class="info-text">{{stats.user_count}}</h3>
+                <p class="info-text">Number of Twitter Users</p>
+              </center>
+            </div>
+            <div class="four columns">
+              <center>
+                <h3 class="info-text">{{stats.tweet_count}}</h3>
+                <p class="info-text">Number of Tweets Gathered</p>
+              </center>
+            </div>
+            <div class="four columns">
+              <center>
+                <h3 class="info-text">{{stats.tweet_average}}</h3>
+                <p class="info-text">Average Characters in a Tweet</p>
+              </center>
+            </div>
+          </div>
+
+          <div ng-controller="WordsController">
+            <div class="row spaced">
+              <div class="four columns stats" ng-show="initial_stats">
+                <p class="info-text">Most Popular Words</p>
+                <p>
+                  For the sake of excluding articles and less interesting words, these are all the words
+                  past four characters long. Watch as the data changes as the script continuously takes into
+                  account new Tweets added into the system.
+                </p>
+              </div>
+
+              <div class="eight columns">
+                <canvas id="bar" class="chart chart-bar" data="data" labels="labels"></canvas>
+              </div>
+            </div>
+
+            <div class="row spaced">
+              <div class="eight columns">
+                <canvas id="line" class="chart chart-line" data="date_stats_data" labels="date_stats_labels"></canvas>
+              </div>
+
+              <div class="four columns stats" ng-show="initial_stats">
+                <p class="info-text">Tweets Over Time</p>
+                <p>
+                  For the sake of excluding articles and less interesting words, these are all the words
+                  past four characters long. Watch as the data changes as the script continuously takes into
+                  account new Tweets added into the system.
+                </p>
+              </div>
+            </div>
+
+            <div class="row spaced">
+              <div class="four columns stats" ng-show="initial_stats">
+                <p class="info-text">Daily Sentiment</p>
+                <p>
+                  For the sake of excluding articles and less interesting words, these are all the words
+                  past four characters long. Watch as the data changes as the script continuously takes into
+                  account new Tweets added into the system.
+                </p>
+              </div>
+
+              <div class="eight columns">
+                <canvas id="line" class="chart chart-line" data="date_sentiment_data" labels="date_sentiment_labels"></canvas>
+              </div>
+            </div>
+
+            <div class="row spaced">
+              <div class="eight columns stats" ng-show="initial_stats">
+                <p>
+                  For the sake of excluding articles and less interesting words, these are all the words
+                  past four characters long. Watch as the data changes as the script continuously takes into
+                  account new Tweets added into the system.
+                </p>
+              </div>
+
+              <div class="four columns stats" ng-show="initial_stats">
+                <h5>What does this sentiment really mean?</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section information highlight">
+        <div class="container">
+          <div class="row">
+            <div class="four columns">
+              Insert graph here. Maybe word cloud? More friendly to text. Most popular images?
+            </div>
+
+            <div class="eight columns">
+              <canvas id="bar" class="chart chart-bar" data="data" labels="labels"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.6/angular-aria.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-resource.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular-animate.min.js"></script>
+    <script src="/static/js/chart/Chart.js"></script>
+    <script src="/static/js/angular-chart.min.js"></script>
+
+    <script type="text/javascript">
+      (function() {
+        var app = angular.module('social', ['ngRoute', 'ngResource', 'ngAnimate', 'chart.js']);
+
+        app.controller("StatsController", ['$scope', '$resource', '$http', '$interval', 'Stats', function($scope, $resource, $http, $interval, Stats) {
+          $scope.initial = false;
+
+          $interval(function gather_data() {
+            Stats.get(function(data) {
+              console.log("Success, got updated data.");
+              $scope.stats = data;
+              $scope.initial = true;
+            }, function(err) {
+              console.log("Request did not work.");
+            });
+            return gather_data;
+          }(), 10000);
+        }]);
+
+        app.controller("WordsController", ['$scope', 'Words', '$interval', function($scope, Words, $interval) {
+          // $scope.labels = [];
+          // $scope.data = [[]];
+          // $scope.series = ['Words'];
+
+          $scope.initial_stats = false;
+
+          $interval(function gather_data() {
+            Words.get(function(data) {
+              console.log("Success, got words data.");
+              $scope.initial_stats = true;
+              $scope.labels = data['word_stats']['words'];
+              $scope.data = [data['word_stats']['data']];
+
+              $scope.date_stats_labels = data['date_stats']['labels'];
+              $scope.date_stats_data = [data['date_stats']['data']];
+
+              $scope.date_sentiment_labels = data['date_sentiment']['labels'];
+              $scope.date_sentiment_data = [data['date_sentiment']['data']];
+            }, function(err) {
+              console.log("Request did not work for words.");
+            });
+            return gather_data;
+          }(), 15000);
+        }]);
+
+        app.factory('Stats', ['$resource', function($resource) {
+          console.log("Getting stats...");
+          return $resource('/api/stats/');
+        }]);
+
+        app.factory('Words', ['$resource', function($resource) {
+          console.log("Getting words...");
+          return $resource('/api/words/');
+        }]);
+      })();
+
+      $(function() {
+        $('a[href*=#]:not([href=#])').click(function() {
+          if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+            var target = $(this.hash);
+            target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+            if (target.length) {
+              $('html,body').animate({
+                scrollTop: target.offset().top
+              }, 1000);
+              return false;
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
