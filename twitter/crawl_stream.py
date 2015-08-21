@@ -1,17 +1,19 @@
+# Crawls the Twitter sample stream and stores the found tweets in the database
+
 import tweepy, datetime
 
 from colorama import Fore
 
 from ..database import db_session
-
 import models
 
-# todo: fix this. there are warnings about python 2.7 and also
+# TODO: fix this. there are warnings about python 2.7 and also
 # SSL. maybe need to implement SSL because using HTTPS in the
 # requests?
 import logging
 logging.captureWarnings(True)
 
+# TODO: Abstract this out into a settings file
 CONSUMER_KEY = "Fyk4egy7QSrIqxX20lkl3a1WU"
 CONSUMER_SECRET = "WCgiP6q2vnVu7uq4oIOcMVZhQmmV3RsH4lrqtNf6KjXUlsl5lU"
 
@@ -47,7 +49,7 @@ LOCATIONS = (
     ('italy', (6.62665, 35.49308, 18.520281, 47.091999)),
 )
 
-# TODO: find a good place for this? maybe this might belong somewhere else?
+# TODO: Find a good place for this? maybe this might belong somewhere else?
 AUTH = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 AUTH.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 API = tweepy.API(AUTH)
@@ -57,6 +59,7 @@ class TweetStreamListener(tweepy.StreamListener):
     def on_connect(self):
         print("Successfully connected to Twitter streaming API...")
 
+    # Listener for statuses and stores the status in the database
     def on_status(self, status):
         try:
             print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text + Fore.RESET)
@@ -65,6 +68,7 @@ class TweetStreamListener(tweepy.StreamListener):
             # print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text.encode('ascii', 'ignore').decode('ascii') + Fore.RESET)
             print("Got tweet: " + str(status.id_str) + ".")
 
+        # Checks for coordinates and places outside coordinates in place of them
         try:
             longitude = status.coordinates['coordinates'][0]
             latitude = status.coordinates['coordinates'][1]
@@ -72,6 +76,8 @@ class TweetStreamListener(tweepy.StreamListener):
             longitude = 200
             latitude = 100
 
+        # Checks for the place and replcaes it with undefined if the place is
+        # not filled in by Twitter
         try:
             place = status.place.full_name
         except TypeError:
@@ -79,6 +85,7 @@ class TweetStreamListener(tweepy.StreamListener):
         except AttributeError:
             place = "Undefined"
 
+        # TODO: Add try/except for extremely long tweets
         try:
             store_tweet = models.Tweet(text = str(status.text.encode('unicode_escape')),
                 user_id = int(status.user.id_str),
