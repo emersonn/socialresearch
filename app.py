@@ -38,6 +38,7 @@ def stats():
         'user_count': db_session.query(Tweet).group_by(Tweet.user_id).count() + random.randint(1, 10),
         'tweet_average': tweet_average})
 
+# Handles a majority of the general data representation
 @app.route('/api/words/')
 def words():
     words = (db_session.query(Word)
@@ -82,23 +83,29 @@ def words():
 
     query = db_session.query(Word).filter(Word.word.contains("#")).join(Word.context).group_by(Word.id).order_by(func.count(Tweet.id).desc()).limit(20).all()
     hashtag_sentiment = {'labels': [], 'data': []}
+    hashtag_distribution = {'labels': [], 'data': []}
 
     # TODO: Abstract this out
     for hashtag in query:
         hashtag_sentiment['labels'].append(hashtag.word[:10])
+        hashtag_distribution['labels'].append(hashtag.word[:10])
 
         tweets = hashtag.context
         sentiment = 0.0
+        favorites = 0.0
 
         for tweet in tweets:
             if tweet.sentiment_dist != None:
                 sentiment += tweet.sentiment_dist
+                favorites += tweet.favorite_count
         try:
             hashtag_sentiment['data'].append(sentiment/len(tweets))
+            hashtag_distribution['data'].append(favorites/len(tweets))
         except ZeroDivisionError:
             hashtag_sentiment['data'].append(0)
+            hashtag_distribution['data'].append(0)
 
-    return jsonify({'word_stats': word_stats, 'date_stats': date_stats, 'date_sentiment': date_sentiment, 'hashtag_sentiment': hashtag_sentiment})
+    return jsonify({'word_stats': word_stats, 'date_stats': date_stats, 'date_sentiment': date_sentiment, 'hashtag_sentiment': hashtag_sentiment, 'hashtag_distribution': hashtag_distribution})
 
 @app.route('/api/religion/')
 def religion():

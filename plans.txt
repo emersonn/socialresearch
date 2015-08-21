@@ -102,9 +102,12 @@ Crawling Twitter
     - Sentiment over a period of time
       - The past week
     - Current popular hashtags and sentiment towards those hashtags
-    - Current trends and the sentiment towards the trends
+    - Current trends and the sentiment towards the trends in addition to favorites/retweets of such
+    - Case study on Taylor Swift
+      - Influence on her community, her saying something and it's reception and rating them
+        through sentiment. Her replies and how they are received by the community, etc.
 
-    - Current workflow: crawl_stream to analyze 
+    - Current workflow: crawl_stream to analyze
 
     - Get tweets that have not been classified with tags, limit to 100, then tag them then keep tagging
     - Get all tweets for a specified location and classify by a certain group of tags
