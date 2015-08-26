@@ -117,4 +117,4 @@ def religion():
     return jsonify({'pie_chart': pie_chart})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')
