@@ -144,12 +144,13 @@ Crawling Twitter
 
 
     - Todo for production:
-      - Install flask, Alembic
-      - Alembic follow setup to generate files, modify .ini, and env.py
-      - Migrate database
-      - Fix state file serving, etc.
-      - Classify a few sentiment
+      - Install flask, Alembic (done)
+      - Alembic follow setup to generate files, modify .ini, and env.py (done)
+      - Migrate database (done)
+      - Fix static file serving, etc.
+      - Classify a few sentiment (done)
       - Debug is on
+      - Add security to the server
 
 
       - "import sys

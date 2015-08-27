@@ -31,12 +31,21 @@ def index():
 
 @app.route('/api/stats/')
 def stats():
-    random_tweets = [len(tweet.text) for tweet in db_session.query(Tweet).order_by(func.rand()).limit(1000)]
-    tweet_average = round(reduce(lambda x, y: x + y, random_tweets) / float(len(random_tweets)), 2)
+    tweet_count = db_session.query(func.count(Tweet.id)).scalar()
+    tweet_sample = random.sample(xrange(0, tweet_count), 1000)
+    random_tweets = db_session.query(Tweet).filter(Tweet.id.in_(tweet_sample))
 
-    return jsonify({'tweet_count': db_session.query(Tweet).count() + random.randint(1, 10),
-        'user_count': db_session.query(Tweet).group_by(Tweet.user_id).count() + random.randint(1, 10),
-        'tweet_average': tweet_average})
+    # TODO: Abstract this out to reduce redundancy
+    tweet_text = [len(tweet.text) for tweet in random_tweets]
+    tweet_text_average = round(reduce(lambda x, y: x + y, tweet_text) / float(len(tweet_text)), 2)
+
+    tweet_retweet = [tweet.retweet_count for tweet in random_tweets]
+    tweet_retweet_average = round(reduce(lambda x, y: x + y, tweet_retweet) / float(len(tweet_retweet)), 5)
+
+    return jsonify({'tweet_count': tweet_count,
+        # 'user_count': db_session.query(Tweet).group_by(Tweet.user_id).count(),
+        'user_count': tweet_retweet_average,
+        'tweet_average': tweet_text_average})
 
 # Handles a majority of the general data representation
 @app.route('/api/words/')
