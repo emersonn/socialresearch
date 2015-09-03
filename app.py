@@ -50,10 +50,12 @@ def stats():
 # Handles a majority of the general data representation
 @app.route('/api/words/')
 def words():
+    # TODO: Very bad query when it comes to > 10 mil rows. cache it? pre process it? index it?
+    #       prune it? it's not like words change over 100,000 at least rows
     words = (db_session.query(Word)
                 .join(Word.context)
                 .group_by(Word.id)
-                .having(func.length(Word.word) > 4)
+                .having(func.length(Word.word) > 5)
                 .order_by(func.count(Tweet.id).desc())
                 .limit(20).all())
 
@@ -66,6 +68,7 @@ def words():
     date_stats = {'labels': [], 'data': []}
     date_sentiment = {'labels': [], 'data': []}
 
+    # TODO: Very inefficient way to go about it
     for days in range(0, 31):
         days_ago = current_time - datetime.timedelta(days = days)
 

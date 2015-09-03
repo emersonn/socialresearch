@@ -7,9 +7,7 @@ from colorama import Fore
 from ..database import db_session
 import models
 
-# TODO: fix this. there are warnings about python 2.7 and also
-# SSL. maybe need to implement SSL because using HTTPS in the
-# requests?
+# TODO: fix this. SSL warnings.
 import logging
 logging.captureWarnings(True)
 
@@ -20,8 +18,7 @@ CONSUMER_SECRET = "WCgiP6q2vnVu7uq4oIOcMVZhQmmV3RsH4lrqtNf6KjXUlsl5lU"
 ACCESS_TOKEN = "1714296900-aVCQhI3HfjUnzDtGqWRZ7LvzGIad6bmWwB4HIIK"
 ACCESS_SECRET = "Ez00jB4IDK3mQQqsVPjtROOQL95LzjsTuuqIRghwLClJB"
 
-# http://isithackday.com/geoplanet-explorer/index.php?woeid=2345496
-# United States vs Germany
+# DEPRICATED: old summer project. has been expanded now.
 """
 LOCATIONS = (('berlin', (13.09, 52.34, 13.76, 52.68)),
              ('seattle', (-122.44, 47.50, -122.24, 47.73)),
@@ -49,7 +46,7 @@ LOCATIONS = (
     ('italy', (6.62665, 35.49308, 18.520281, 47.091999)),
 )
 
-# TODO: Find a good place for this? maybe this might belong somewhere else?
+# TODO: settings file.
 AUTH = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 AUTH.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 API = tweepy.API(AUTH)
@@ -64,8 +61,6 @@ class TweetStreamListener(tweepy.StreamListener):
         try:
             print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text + Fore.RESET)
         except UnicodeEncodeError:
-            # TODO: fix this, very hacky workaround to run on server
-            # print(Fore.GREEN + status.user.name + ": " + Fore.BLUE + status.text.encode('ascii', 'ignore').decode('ascii') + Fore.RESET)
             print("Got tweet: " + str(status.id_str) + ".")
 
         # Checks for coordinates and places outside coordinates in place of them
@@ -118,7 +113,7 @@ if __name__ == '__main__':
     stream_listener = TweetStreamListener()
     stream = tweepy.Stream(auth = API.auth, listener = stream_listener)
 
-    # Depricated location filtering, using sample now
+    # DEPRICATED: location filtering, using sample now
     """
     locations = []
     for location in LOCATIONS:
@@ -130,17 +125,15 @@ if __name__ == '__main__':
 
     print("Using sample stream...")
 
-    # stream.filter(locations = [13.09, 52.34, 13.76, 52.68, -122.44, 47.50, -122.24, 47.73])
-    # TODO: Very hacky. Make it so it doesn't use a while loop and try, except. Also include in logging.
     import sqlalchemy
     while 1:
         try:
             print(Fore.RED + "Starting Twitter stream..." + Fore.RESET)
+
+            # DEPRICATED: old location based project
             # stream.filter(locations = locations)
             stream.sample()
         except UnicodeDecodeError:
             pass
         except sqlalchemy.exc.DataError:
             pass
-
-    # stream.filter(track=['penis'])

@@ -28,11 +28,17 @@ PRESET_TAGS = {
 def generate_classifier():
     print(Fore.GREEN + "Generating classifier..." + Fore.RESET)
 
-    # TODO: make this more general rather than having "sentiment"
-
     # Finds all tweets with classifications
-    response_pos = db_session.query(Tweet).filter_by(**{"sentiment" + "_classify": "pos"}).all()
-    response_neg = db_session.query(Tweet).filter_by(**{"sentiment" + "_classify": "neg"}).all()
+    response_pos = (db_session
+        .query(Tweet)
+        .filter_by(**{"sentiment" + "_classify": "pos"})
+        .all()
+    )
+    response_neg = (db_session
+        .query(Tweet)
+        .filter_by(**{"sentiment" + "_classify": "neg"})
+        .all()
+    )
 
     # Trains the classifier
     train_pos = [(response.text, "pos") for response in response_pos]
@@ -71,6 +77,8 @@ def analyze_tweet(tweet):
 
     # Tags the tweet based on current preset tags and their characteristic
     # classification words
+
+    # TODO: slow processing. improve w/ backwards search.
     print("Analyzing tags...")
     for tag in PRESET_TAGS.keys():
         model = db_session.query(Tag).filter_by(tag = tag).first()
@@ -102,16 +110,25 @@ if __name__ == "__main__":
 
     # Queries the first QUERY_LIMIT amount of tweets and "paginates" through them
     # for the tweets that haven't been analyzed yet
-    query = db_session.query(Tweet).filter_by(analyzed_date = None).order_by(Tweet.created_at.desc()).limit(QUERY_LIMIT).all()
+    query = (db_session
+        .query(Tweet)
+        .filter_by(analyzed_date = None)
+        .order_by(Tweet.created_at.desc())
+        .limit(QUERY_LIMIT)
+        .all()
+    )
 
     while len(query) != 0:
         for tweet in query:
             COUNTER += 1
             print("On tweet number " + str(COUNTER) + ".")
-            # Second check to allow for multiple scripts to be running at the
-            # same time
+            # Second check to allow for multiple scripts to run
             if tweet.analyzed_date == None:
                 analyze_tweet(tweet)
 
         print("Grabbing new query...")
-        query = db_session.query(Tweet).filter_by(analyzed_date = None).limit(QUERY_LIMIT).all()
+        query = (db_session.query(Tweet)
+            .filter_by(analyzed_date = None)
+            .limit(QUERY_LIMIT)
+            .all()
+        )

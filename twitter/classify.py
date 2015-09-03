@@ -4,13 +4,12 @@ from ..database import db_session
 
 import models
 
-# TODO: Move this to a settings file and make it more editable in the models?
+# TODO: abstract this out into a settings file
 CLASSIFICATIONS = ['sentiment', 'personal', 'convo', 'know']
 
 def classify(classification):
-    # response = db_session.execute('SELECT * FROM tweet WHERE ' + classification + '_classify is NULL')
     current = classification + "_classify"
-    # TODO: fix this so it paginates, easy fix
+    # TODO: add pagination to make this "infinite" classification creation
     response = db_session.query(models.Tweet).filter_by(**{current: None}).limit(100)
 
     for row in response:
@@ -38,8 +37,6 @@ def classify(classification):
         db_session.commit()
 
         print("Classified as " + Fore.RED + user + Fore.RESET + ".")
-
-
 
 if __name__ == "__main__":
     classification = raw_input("What type are we classifying? (" + ", ".join(CLASSIFICATIONS) + ") ")

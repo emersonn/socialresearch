@@ -1,8 +1,6 @@
 from sqlalchemy import Table, Column, Integer, String, DateTime, Boolean, ForeignKey, Float, BigInteger
 from sqlalchemy.orm import relationship, backref
 
-# from ..database import Base
-
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
 Base = declarative_base()
