@@ -4,3 +4,8 @@ alembic/
 alembic.ini
 env
 */**/legacy
+app_settings.py
+settings.py
+config.py
+private.py
+

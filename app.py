@@ -1,33 +1,26 @@
-import datetime, random
+import datetime
+import random
 
 from flask import Flask, jsonify, send_file
 from sqlalchemy import func
-# from sqlalchemy.sql.expression import func
 
+from twitter.config import PRESET_TAGS
 from twitter.models import Tweet, Word, Tag
 from database import db_session
 
 app = Flask(__name__)
-# app.config.from_object('app_settings')
+app.config.from_object('app_settings')
 
-# DEBUG IS ON
-app.debug = True
-
-# TODO: Fix this by abstracting it out of analyze and app
-PRESET_TAGS = {
-    'Christian': ['God', 'Bible', 'Jesus', 'Jesus Christ', 'Church', 'Amen', 'Baptism', 'Christ', 'Holy Easter', 'Easter Sunday', 'Holy Spirit'],
-    'Muslim': ['Koran', "Quran", "Q'uran", "Allah", "Mosque", 'Allahu Akbar', 'Ramadan', "Jumu'ah"],
-    'Buddhist': ['Arahat', 'asura', 'Buddha', 'dharma', 'four noble truths', 'mantra', 'nirvana', 'Tao'],
-    'Hindu': ['Brahman', 'Ishvara', 'Atman', 'Maya', 'Samsara', 'Niti shastra', 'Asteya', 'Astika', 'Vishnu', 'Shiva', 'Vedas']
-}
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
 
+
 @app.route('/')
 def index():
     return send_file('static/index.html')
+
 
 @app.route('/api/stats/')
 def stats():
@@ -35,29 +28,39 @@ def stats():
     tweet_sample = random.sample(xrange(0, tweet_count), 1000)
     random_tweets = db_session.query(Tweet).filter(Tweet.id.in_(tweet_sample))
 
-    # TODO: Abstract this out to reduce redundancy
+    # TODO: Abstract these calculations, make it more efficient
     tweet_text = [len(tweet.text) for tweet in random_tweets]
-    tweet_text_average = round(reduce(lambda x, y: x + y, tweet_text) / float(len(tweet_text)), 2)
+    tweet_text_average = round(
+        reduce(lambda x, y: x + y, tweet_text) / float(len(tweet_text)), 2
+    )
 
     tweet_retweet = [tweet.retweet_count for tweet in random_tweets]
-    tweet_retweet_average = round(reduce(lambda x, y: x + y, tweet_retweet) / float(len(tweet_retweet)), 5)
+    tweet_retweet_average = round(
+        reduce(lambda x, y: x + y, tweet_retweet) / float(len(tweet_retweet)),
+        5
+    )
 
-    return jsonify({'tweet_count': tweet_count,
-        # 'user_count': db_session.query(Tweet).group_by(Tweet.user_id).count(),
-        'user_count': tweet_retweet_average,
-        'tweet_average': tweet_text_average})
+    return jsonify(
+        {
+            'tweet_count': tweet_count,
+            'user_count': tweet_retweet_average,
+            'tweet_average': tweet_text_average
+        }
+    )
 
-# Handles a majority of the general data representation
+
 @app.route('/api/words/')
 def words():
-    # TODO: Very bad query when it comes to > 10 mil rows. cache it? pre process it? index it?
-    #       prune it? it's not like words change over 100,000 at least rows
-    words = (db_session.query(Word)
-                .join(Word.context)
-                .group_by(Word.id)
-                .having(func.length(Word.word) > 5)
-                .order_by(func.count(Tweet.id).desc())
-                .limit(20).all())
+    # TODO: Cache, preprocess, index, prune?
+    #       Improve the efficiency of this calculation
+    words = (
+        db_session.query(Word)
+        .join(Word.context)
+        .group_by(Word.id)
+        .having(func.length(Word.word) > 5)
+        .order_by(func.count(Tweet.id).desc())
+        .limit(20).all()
+    )
 
     word_stats = {'words': [word.word for word in words], 'data': []}
 
@@ -70,7 +73,7 @@ def words():
 
     # TODO: Very inefficient way to go about it
     for days in range(0, 31):
-        days_ago = current_time - datetime.timedelta(days = days)
+        days_ago = current_time - datetime.timedelta(days=days)
 
         # extend to an existing?
         if days_ago.date() != datetime.datetime.today().date():
@@ -80,12 +83,16 @@ def words():
         date_stats['labels'].append(date_format)
         date_sentiment['labels'].append(date_format)
 
-        tweets = db_session.query(Tweet).filter(func.DATE(Tweet.created_at) == days_ago.date()).all()
+        tweets = (
+            db_session.query(Tweet)
+            .filter(func.DATE(Tweet.created_at) == days_ago.date())
+            .all()
+        )
         date_stats['data'].append(len(tweets))
 
         sentiment = 0.0
         for tweet in tweets:
-            if tweet.sentiment_dist != None:
+            if tweet.sentiment_dist is not None:
                 sentiment += tweet.sentiment_dist
         try:
             date_sentiment['data'].append(sentiment/len(tweets))
@@ -93,7 +100,16 @@ def words():
             date_sentiment['data'].append(0)
         # strftime ("%A (%D)")
 
-    query = db_session.query(Word).filter(Word.word.contains("#")).join(Word.context).group_by(Word.id).order_by(func.count(Tweet.id).desc()).limit(20).all()
+    query = (
+        db_session.query(Word)
+        .filter(Word.word.contains("#"))
+        .join(Word.context)
+        .group_by(Word.id)
+        .order_by(func.count(Tweet.id).desc())
+        .limit(20)
+        .all()
+    )
+
     hashtag_sentiment = {'labels': [], 'data': []}
     hashtag_distribution = {'labels': [], 'data': []}
 
@@ -107,7 +123,7 @@ def words():
         favorites = 0.0
 
         for tweet in tweets:
-            if tweet.sentiment_dist != None:
+            if tweet.sentiment_dist is not None:
                 sentiment += tweet.sentiment_dist
                 favorites += tweet.favorite_count
         try:
@@ -117,14 +133,25 @@ def words():
             hashtag_sentiment['data'].append(0)
             hashtag_distribution['data'].append(0)
 
-    return jsonify({'word_stats': word_stats, 'date_stats': date_stats, 'date_sentiment': date_sentiment, 'hashtag_sentiment': hashtag_sentiment, 'hashtag_distribution': hashtag_distribution})
+    return jsonify(
+        {
+            'word_stats': word_stats,
+            'date_stats': date_stats,
+            'date_sentiment': date_sentiment,
+            'hashtag_sentiment': hashtag_sentiment,
+            'hashtag_distribution': hashtag_distribution
+        }
+    )
+
 
 @app.route('/api/religion/')
 def religion():
     pie_chart = {'labels': [], 'data': []}
     for tag in PRESET_TAGS.keys():
         pie_chart['labels'].append(tag)
-        pie_chart['data'].append(len(db_session.query(Tag).having(Tag.tag == tag).one().tweets))
+        pie_chart['data'].append(
+            len(db_session.query(Tag).having(Tag.tag == tag).one().tweets)
+        )
 
     return jsonify({'pie_chart': pie_chart})
 
