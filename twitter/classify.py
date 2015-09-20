@@ -11,7 +11,8 @@ import models
 
 def classify(classification):
     current = classification + "_classify"
-    # TODO: Add pagination for infinite classification
+
+    # TODO: Add pagination for infinite classification until exit
     response = (
         db_session.query(models.Tweet)
         .filter_by(**{current: None})
@@ -48,7 +49,6 @@ def classify(classification):
             user = "no"
 
         setattr(row, current, user)
-
         db_session.commit()
 
         print("Classified as " + Fore.RED + user + Fore.RESET + ".")

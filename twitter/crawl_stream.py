@@ -13,6 +13,10 @@ API = tweepy.API(AUTH)
 
 
 class TweetStreamListener(tweepy.StreamListener):
+    """
+    Adds functionality to the Tweepy Stream Listener
+    """
+
     def on_connect(self):
         print("Successfully connected to Twitter streaming API...")
 
@@ -85,9 +89,8 @@ if __name__ == '__main__':
     while 1:
         try:
             print(Fore.RED + "Starting Twitter stream..." + Fore.RESET)
-
             stream.sample()
         except UnicodeDecodeError:
-            pass
+            print("Encountered UnicodeDecode error.")
         except sqlalchemy.exc.DataError:
-            pass
+            print("Encountered SQLAlchemy DataError.")

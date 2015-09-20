@@ -18,8 +18,8 @@ class Trend(Base):
     place = Column(String(400))
 
 # TODO: Modify the association table's names
-association_table = Table(
-    'association',
+tag_table = Table(
+    'tweet_tag',
     Base.metadata,
     Column('tweet_id', Integer, ForeignKey('tweet.id')),
     Column('tag_id', Integer, ForeignKey('tag.id'))
@@ -73,7 +73,7 @@ class Tweet(Base):
 
     analyzed_date = Column(DateTime)
 
-    tags = relationship('Tag', secondary=association_table, backref="tweets")
+    tags = relationship('Tag', secondary=tag_table, backref="tweets")
 
 
 class Tag(Base):
