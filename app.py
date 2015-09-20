@@ -14,16 +14,28 @@ app.config.from_object('app_settings')
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
+    """
+    Ensures that when the app is removed, the database is closed.
+    """
+
     db_session.remove()
 
 
 @app.route('/')
 def index():
+    """
+    Routes the index of the website.
+    """
+
     return send_file('static/index.html')
 
 
 @app.route('/api/stats/')
 def stats():
+    """
+    Calculates quick stats of the database.
+    """
+
     tweet_count = db_session.query(func.count(Tweet.id)).scalar()
     tweet_sample = random.sample(xrange(0, tweet_count), 1000)
     random_tweets = db_session.query(Tweet).filter(Tweet.id.in_(tweet_sample))
@@ -51,6 +63,10 @@ def stats():
 
 @app.route('/api/words/')
 def words():
+    """
+    Calculates the bulk of the general statistics and information.
+    """
+
     # TODO: Cache, preprocess, index, prune?
     #       Improve the efficiency of this calculation
     words = (
@@ -75,7 +91,7 @@ def words():
     for days in range(0, 31):
         days_ago = current_time - datetime.timedelta(days=days)
 
-        # extend to an existing?
+        # TODO: Extend to an existing?
         if days_ago.date() != datetime.datetime.today().date():
             date_format = days_ago.strftime("%A (%D)")
         else:
@@ -146,6 +162,10 @@ def words():
 
 @app.route('/api/religion/')
 def religion():
+    """
+    Calculates specific statistics related to religion.
+    """
+
     pie_chart = {'labels': [], 'data': []}
     for tag in PRESET_TAGS.keys():
         pie_chart['labels'].append(tag)
