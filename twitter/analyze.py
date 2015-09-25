@@ -55,6 +55,7 @@ def analyze_tweet(tweet, classifier):
             print(current_word + " does not exist. Creating.")
             model = Word(word=current_word)
             db_session.add(model)
+            db_session.commit()
         model.context.append(tweet)
 
     for tag in PRESET_TAGS.keys():
@@ -63,6 +64,7 @@ def analyze_tweet(tweet, classifier):
             print(tag + " does not exist in the database. Creating.")
             model = Tag(tag=tag)
             db_session.add(model)
+            db_session.commit()
 
         print("Analyzing tag: " + tag + ".")
         if any(curr in tweet.text for curr in PRESET_TAGS[tag]):

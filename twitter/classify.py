@@ -21,7 +21,7 @@ def classify(classification):
 
     for row in response:
         print(
-            Fore.BLUE + "The tweet: " + Fore.RESET +
+            Fore.BLUE + "The tweet (" + str(row.id) + "): " + Fore.RESET +
             row.text.decode('unicode-escape')
         )
 
