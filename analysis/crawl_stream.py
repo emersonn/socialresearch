@@ -5,6 +5,8 @@ Emerson Matson
 Collects tweets from the Twitter sample stream.
 """
 
+from sqlalchemy.exc import DataError
+
 import tweepy
 
 from prettylog import PrettyLog
@@ -54,25 +56,28 @@ class TweetStreamListener(tweepy.StreamListener):
         except (TypeError, AttributeError):
             place = None
 
-        store_tweet = Tweet(
-            text=str(status.text.encode('unicode_escape')),
+        try:
+            store_tweet = Tweet(
+                text=str(status.text.encode('unicode_escape')),
 
-            user_id=int(status.user.id_str),
-            screen_name=status.user.screen_name,
+                user_id=int(status.user.id_str),
+                screen_name=status.user.screen_name,
 
-            number=int(status.id_str),
-            created_at=status.created_at,
+                number=int(status.id_str),
+                created_at=status.created_at,
 
-            favorite_count=status.favorite_count,
-            retweet_count=status.retweet_count,
+                favorite_count=status.favorite_count,
+                retweet_count=status.retweet_count,
 
-            longitude=longitude,
-            latitude=latitude,
-            place=place
-        )
+                longitude=longitude,
+                latitude=latitude,
+                place=place
+            )
 
-        db.session.add(store_tweet)
-        db.session.commit()
+            db.session.add(store_tweet)
+            db.session.commit()
+        except DataError:
+            LOGGING.push("Tweet too long, skipping.")
 
         if self.num_tweets % 100 == 0:
             LOGGING.push(
