@@ -1,0 +1,28 @@
+Crawl the Stream for Tweets
+  Consider storing information about Tweet connections for Graph representations
+
+Crawl the Internet for articles given a particular topic
+  Religion, for example. Look for common words in religion, then we know
+    for certain religions, what words we can look for to define particular
+    tweets for a certain religion.
+
+Use a sentiment database if there is one to be found for different topics.
+
+Results:
+  Sentiment with regards to certain religious topics
+    Christianity, Islam
+      What kind of features define these topics? What keywords exist?
+
+  Conversation with respect to certain articles
+    What kind of responses from what kind of people? What conversations
+      arise from a particular article?
+    Color graphs with respect to articles. Squares with a respective
+      green to red sentiment. Kind of like grid of small squares.
+
+Particular Person:
+  Color graph of squares ordered by time.
+
+  Most positive, most negative Tweet.
+    What kind of people are you surrounded by?
+    Who is most aggressive to you? Who is nicest to you?
+      Examples, why?
