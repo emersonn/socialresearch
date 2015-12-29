@@ -1,46 +1,44 @@
 import datetime
 import random
 
-from flask import Flask, jsonify, send_file
+from flask import jsonify
+from flask import send_file
 from sqlalchemy import func
 
-from twitter.config import PRESET_TAGS
-from twitter.models import Tweet, Word, Tag
-from database import db_session
+from twitter import app
+from twitter import db
 
-app = Flask(__name__)
-app.config.from_object('app_settings')
+# TODO(Pull this out into somewhere else.)
+from twitter.config import PRESET_TAGS
+
+from twitter.models import Tag
+from twitter.models import Tweet
+from twitter.models import Word
 
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    """
-    Ensures that when the app is removed, the database is closed.
-    """
+    """Ensures that when the app is removed, the database is closed."""
 
-    db_session.remove()
+    db.session.remove()
 
 
 @app.route('/')
 def index():
-    """
-    Routes the index of the website.
-    """
+    """Routes the index of the website."""
 
     return send_file('static/index.html')
 
 
 @app.route('/api/stats/')
 def stats():
-    """
-    Calculates quick stats of the database.
-    """
+    """Calculates quick stats of the database."""
 
-    tweet_count = db_session.query(func.count(Tweet.id)).scalar()
+    tweet_count = db.session.query(func.count(Tweet.id)).scalar()
     tweet_sample = random.sample(xrange(0, tweet_count), 1000)
-    random_tweets = db_session.query(Tweet).filter(Tweet.id.in_(tweet_sample))
+    random_tweets = db.session.query(Tweet).filter(Tweet.id.in_(tweet_sample))
 
-    # TODO: Abstract these calculations, make it more efficient
+    # TODO(Abstract these calculations, make it more efficient.)
     tweet_text = [len(tweet.text) for tweet in random_tweets]
     tweet_text_average = round(
         reduce(lambda x, y: x + y, tweet_text) / float(len(tweet_text)), 2
@@ -63,14 +61,12 @@ def stats():
 
 @app.route('/api/words/')
 def words():
-    """
-    Calculates the bulk of the general statistics and information.
-    """
+    """Calculates the bulk of the general statistics and information."""
 
-    # TODO: Cache, preprocess, index, prune?
-    #       Improve the efficiency of this calculation
+    # TODO(Cache, preprocess, index, prune?)
+    #   Improve the efficiency of this calculation
     words = (
-        db_session.query(Word)
+        db.session.query(Word)
         .join(Word.context)
         .group_by(Word.id)
         .having(func.length(Word.word) > 5)
@@ -87,11 +83,11 @@ def words():
     date_stats = {'labels': [], 'data': []}
     date_sentiment = {'labels': [], 'data': []}
 
-    # TODO: Very inefficient way to go about it
+    # TODO(Very inefficient way to go about it.)
     for days in range(0, 31):
         days_ago = current_time - datetime.timedelta(days=days)
 
-        # TODO: Extend to an existing?
+        # TODO(Extend to an existing?)
         if days_ago.date() != datetime.datetime.today().date():
             date_format = days_ago.strftime("%A (%D)")
         else:
@@ -100,7 +96,7 @@ def words():
         date_sentiment['labels'].append(date_format)
 
         tweets = (
-            db_session.query(Tweet)
+            db.session.query(Tweet)
             .filter(func.DATE(Tweet.created_at) == days_ago.date())
             .all()
         )
@@ -117,7 +113,7 @@ def words():
         # strftime ("%A (%D)")
 
     query = (
-        db_session.query(Word)
+        db.session.query(Word)
         .filter(Word.word.contains("#"))
         .join(Word.context)
         .group_by(Word.id)
@@ -129,7 +125,7 @@ def words():
     hashtag_sentiment = {'labels': [], 'data': []}
     hashtag_distribution = {'labels': [], 'data': []}
 
-    # TODO: Abstract this out
+    # TODO(Abstract this out.)
     for hashtag in query:
         hashtag_sentiment['labels'].append(hashtag.word[:10])
         hashtag_distribution['labels'].append(hashtag.word[:10])
@@ -162,15 +158,13 @@ def words():
 
 @app.route('/api/religion/')
 def religion():
-    """
-    Calculates specific statistics related to religion.
-    """
+    """Calculates specific statistics related to religion."""
 
     pie_chart = {'labels': [], 'data': []}
     for tag in PRESET_TAGS.keys():
         pie_chart['labels'].append(tag)
         pie_chart['data'].append(
-            len(db_session.query(Tag).having(Tag.tag == tag).one().tweets)
+            len(db.session.query(Tag).having(Tag.tag == tag).one().tweets)
         )
 
     return jsonify({'pie_chart': pie_chart})
