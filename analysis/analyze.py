@@ -38,8 +38,10 @@ from twitter.models import Tweet
 STOPWORDS = set(stopwords.words('english') + list(punctuation))
 
 CATEGORIES = [
-    'Christianity',
-    'Islam'
+    'Christian',
+    'Muslim',
+    'Buddhist',
+    'None'
 ]
 
 LOGGING = PrettyLog()
@@ -121,9 +123,16 @@ def get_classify_set(categories=CATEGORIES):
     for category in CATEGORIES:
         LOGGING.push("Assigning category: @" + category + "@.")
 
-        tweets = (
-            db.session.query(Tweet).filter(Tweet.text.contains(category)).all()
-        )
+        if category != 'None':
+            tweets = (
+                db.session.query(Tweet)
+                .filter(Tweet.text.contains(category)).all()
+            )
+        else:
+            # TODO(Should manually do this but very low chance it's religious.)
+            tweets = (
+                db.session.query(Tweet).limit(1000).all()
+            )
 
         if tweets:
             clean_add(tweets, results, category)
@@ -208,13 +217,14 @@ def clean_add(tweets, results, label):
         ))
 
 
-def classify_tweets():
+# TODO(Put the categories into get_classify_set also.)
+def classify_tweets(categories=CATEGORIES):
     """Combines Scikit-Learn and NLTK with a SVM to classify tweets."""
 
     classifier = get_classifier()
 
     # TODO(Fix this to the whole database.)
-    tweets = db.session.query(Tweet.text).limit(100).all()
+    tweets = db.session.query(Tweet.text).limit(1000).all()
     prepared_tweets = []
 
     widgets = [
@@ -230,7 +240,12 @@ def classify_tweets():
     probabilities = classifier.prob_classify_many(prepared_tweets)
 
     for i, v in enumerate(zip(results, probabilities)):
-        print(str(i) + " : " + str(v))
+        if str(v[0]) != 'None':
+            print(tweets[i].text)
+            print("Classified as : " + str(v[0]))
+
+            for category in categories:
+                print(category + " : " + str(v[1].prob(category)))
 
 
 def get_classifier():
@@ -262,8 +277,8 @@ def get_classifier():
     classified_test = classifier.classify_many(test_features)
     print(classification_report(
         test_label, classified_test,
-        labels=list(set(test_label)),
-        target_names=CATEGORIES
+        # label=list(set(test_label)),
+        # target_names=CATEGORIES
     ))
 
     return classifier
