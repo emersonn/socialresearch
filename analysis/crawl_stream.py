@@ -5,8 +5,6 @@ Emerson Matson
 Collects tweets from the Twitter sample stream.
 """
 
-from colorama import Fore
-
 import tweepy
 
 from prettylog import PrettyLog
@@ -30,17 +28,14 @@ LOGGING = PrettyLog()
 
 
 class TweetStreamListener(tweepy.StreamListener):
-    """Adds functionality to the Tweepy Stream Listener"""
+    """Configures the Stream Listener for storage"""
 
     # TODO(Consider using PrettyLog for this.)
     def on_connect(self):
         LOGGING.push("Successfully connected to Twitter streaming API.")
 
     def on_status(self, status):
-        LOGGING.push(
-            Fore.GREEN + status.user.name + ": " +
-            Fore.BLUE + status.text + Fore.RESET
-        )
+        LOGGING.push("*" + status.user.name + "*: " + status.text)
 
         # Checks for coordinates and places outside coordinates
         try:
@@ -73,15 +68,15 @@ class TweetStreamListener(tweepy.StreamListener):
         db.session.commit()
 
     def on_error(self, status_code):
-        print(
-            "Received error with status code: ", str(status_code) +
-            ". Disconnecting from stream."
+        LOGGING.push(
+            "Received error with status code: #", str(status_code) +
+            "#. Disconnecting from stream."
         )
 
         return False
 
     def on_timeout(self):
-        print("Server timed out.")
+        LOGGING.push("Server timed out.")
 
         return True
 
@@ -89,7 +84,5 @@ if __name__ == '__main__':
     stream_listener = TweetStreamListener()
     stream = tweepy.Stream(auth=API.auth, listener=stream_listener)
 
-    print("Starting to collect the sample stream.")
-
-    print(Fore.RED + "Starting Twitter stream..." + Fore.RESET)
+    LOGGING.push("Starting to collect the sample stream.")
     stream.sample()
