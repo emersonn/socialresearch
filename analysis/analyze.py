@@ -20,8 +20,12 @@ from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 
 from sklearn.metrics import classification_report
-from sklearn.svm import LinearSVC
+# from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 
+from progressbar import Bar
+from progressbar import ETA
+from progressbar import Percentage
 from progressbar import ProgressBar
 
 from prettylog import PrettyLog
@@ -112,6 +116,8 @@ def get_classify_set(categories=CATEGORIES):
     # TODO(This is the easy way to train the set. Find another way.)
     #   Crawling websites and finding words that relate to it so it can
     #       search those instead or use those as features.
+
+    # TODO(Does there need to be a None category? Would it help?)
     for category in CATEGORIES:
         LOGGING.push("Assigning category: @" + category + "@.")
 
@@ -206,14 +212,25 @@ def classify_tweets():
     """Combines Scikit-Learn and NLTK with a SVM to classify tweets."""
 
     classifier = get_classifier()
-    tweets = db.session.query(Tweet.text).all()
+
+    # TODO(Fix this to the whole database.)
+    tweets = db.session.query(Tweet.text).limit(100).all()
     prepared_tweets = []
 
-    progress = ProgressBar()
+    widgets = [
+        Percentage(),
+        ' ', Bar(),
+        ' ', ETA(),
+    ]
+    progress = ProgressBar(widgets=widgets)
     for tweet in progress(tweets):
         prepared_tweets.append(prepare_text(tweet.text))
 
-    classifier.classify_many(prepared_tweets)
+    results = classifier.classify_many(prepared_tweets)
+    probabilities = classifier.prob_classify_many(prepared_tweets)
+
+    for i, v in enumerate(zip(results, probabilities)):
+        print(str(i) + " : " + str(v))
 
 
 def get_classifier():
@@ -232,7 +249,8 @@ def get_classifier():
     test_set = classified[:test_size]
 
     # TODO(Use a SVC instead of a LinearSVC for probabilities.)
-    classifier = SklearnClassifier(LinearSVC())
+    # TODO(Is there an advantage of LinearSVC?)
+    classifier = SklearnClassifier(SVC(probability=True))
     classifier.train(train_set)
 
     # TODO(Make this into a neater lambda function.)
