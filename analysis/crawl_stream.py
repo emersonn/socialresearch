@@ -35,7 +35,9 @@ class TweetStreamListener(tweepy.StreamListener):
         LOGGING.push("Successfully connected to Twitter streaming API.")
 
     def on_status(self, status):
-        LOGGING.push("*" + status.user.name + "*: " + status.text)
+        LOGGING.push(
+            "*" + status.user.name + "*: " + LOGGING.clean(status.text)
+        )
 
         # Checks for coordinates and places outside coordinates
         try:
