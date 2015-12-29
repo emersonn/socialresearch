@@ -29,6 +29,7 @@ LOGGING = PrettyLog()
 
 class TweetStreamListener(tweepy.StreamListener):
     """Configures the Stream Listener for storage"""
+    num_tweets = 0
 
     # TODO(Consider using PrettyLog for this.)
     def on_connect(self):
@@ -38,6 +39,8 @@ class TweetStreamListener(tweepy.StreamListener):
         LOGGING.push(
             "*" + status.user.name + "*: " + LOGGING.clean(status.text)
         )
+
+        self.num_tweets += 1
 
         try:
             longitude = status.coordinates['coordinates'][0]
@@ -70,6 +73,11 @@ class TweetStreamListener(tweepy.StreamListener):
 
         db.session.add(store_tweet)
         db.session.commit()
+
+        if self.num_tweets % 100 == 0:
+            LOGGING.push(
+                "*" + str(self.num_tweets) + "* tweets have been collected."
+            )
 
     def on_error(self, status_code):
         LOGGING.push(
