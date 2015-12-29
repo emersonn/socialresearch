@@ -1,6 +1,9 @@
 Crawl the Stream for Tweets
   Consider storing information about Tweet connections for Graph representations
 
+Crawl the Search for Tweets
+  Crawl for specific categorical tweets just for training
+
 Crawl the Internet for articles given a particular topic
   Religion, for example. Look for common words in religion, then we know
     for certain religions, what words we can look for to define particular
