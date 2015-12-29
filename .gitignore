@@ -8,4 +8,4 @@ app_settings.py
 settings.py
 config.py
 private.py
-
+legacy/
