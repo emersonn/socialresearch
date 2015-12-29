@@ -1,0 +1,14 @@
+"""SQLAlchemy Settings"""
+SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+"""Flask Settings"""
+DEBUG = True
+SECRET_KEY = '420'
+
+"""Twitter Settings"""
+CONSUMER_KEY = "YOUR_KEY_HERE"
+CONSUMER_SECRET = "YOUR_KEY_HERE"
+
+ACCESS_TOKEN = "YOUR_KEY_HERE"
+ACCESS_SECRET = "YOUR_KEY_HERE"
