@@ -11,12 +11,18 @@ from random import shuffle
 from string import punctuation
 
 from nltk.classify.scikitlearn import SklearnClassifier
+
 from nltk.corpus import stopwords
+
 from nltk.stem.snowball import SnowballStemmer
+
+from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 
 from sklearn.metrics import classification_report
 from sklearn.svm import LinearSVC
+
+from progressbar import ProgressBar
 
 from prettylog import PrettyLog
 
@@ -36,27 +42,30 @@ LOGGING = PrettyLog()
 
 
 def remove_stopwords(text):
-    result = ""
+    result = []
     for word in text:
         if word not in STOPWORDS:
-            result += word + " "
+            result.append(word)
 
     return result
 
 
 def stem_text(text):
-    result = ""
+    result = []
 
     stemmer = SnowballStemmer("english")
     for word in text:
-        result += stemmer.stem(word) + " "
+        result.append(stemmer.stem(word))
 
     return result
 
 
 def clean_text(text):
-    filtered_text = remove_stopwords(text)
-    return stem_text(filtered_text)
+    return stem_text(
+        remove_stopwords(
+            text
+        )
+    )
 
 
 def get_classify_set():
@@ -84,19 +93,26 @@ def get_classify_set():
     return results
 
 
-def get_features(text):
+def assign_features(text):
     features = {}
-    tokens = word_tokenize(text)
+    for word in text:
+        features['contains({text})'.format(text=word.lower())] = True
 
-    for token in tokens:
-        features['contains({text})'.format(text=token.lower())] = True
     return features
 
 
 def clean_add(tweets, results, label):
-    for tweet in tweets:
+    progress = ProgressBar()
+
+    for tweet in progress(tweets):
+        sentences = sent_tokenize(tweet.text)
+        tokenized = []
+
+        for sentence in sentences:
+            tokenized.extend(word_tokenize(sentence.lower()))
+
         results.append((
-            get_features(clean_text(tweet.text)),
+            assign_features(clean_text(tokenized)),
             label
         ))
 
@@ -114,6 +130,9 @@ def classify_tweets():
 
     train_set = classified[test_size:]
     test_set = classified[:test_size]
+
+    print("Training set is: " + str(train_set))
+    print("Test set is: " + str(test_set))
 
     # TODO(Use a SVC instead of a LinearSVC for probabilities.)
     classifier = SklearnClassifier(LinearSVC())
