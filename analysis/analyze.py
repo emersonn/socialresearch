@@ -41,6 +41,8 @@ def remove_stopwords(text):
         if word not in STOPWORDS:
             result += word + " "
 
+    return result
+
 
 def stem_text(text):
     result = ""
@@ -48,6 +50,8 @@ def stem_text(text):
     stemmer = SnowballStemmer("english")
     for word in text:
         result += stemmer.stem(word) + " "
+
+    return result
 
 
 def clean_text(text):
@@ -72,7 +76,10 @@ def get_classify_set():
             db.session.query(Tweet).filter(Tweet.text.contains(category)).all()
         )
 
-        clean_add(tweets, results, category)
+        if tweets:
+            clean_add(tweets, results, category)
+        else:
+            print("No tweets were found for #" + category + "#.")
 
     return results
 
@@ -82,7 +89,7 @@ def get_features(text):
     tokens = word_tokenize(text)
 
     for token in tokens:
-        features['contains({text})'.format(token.lower())] = True
+        features['contains({text})'.format(text=token.lower())] = True
     return features
 
 
@@ -122,8 +129,7 @@ def classify_tweets():
     print(classification_report(
         test_label, classified_test,
         labels=list(set(test_label)),
-        # TODO(Abstract this out.)
-        target_names=['Christianity', 'Islam']
+        target_names=CATEGORIES
     ))
 
 if __name__ == "__main__":
