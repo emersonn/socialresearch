@@ -41,7 +41,17 @@ CATEGORIES = [
 LOGGING = PrettyLog()
 
 
-def remove_stopwords(text):
+def remove_stopwords(text, stopwords=STOPWORDS):
+    """Removes stopwords from a given list of words.
+
+    Args:
+        text: List of strings to filter.
+        stopwords: Set of stop words to look for. Default is STOPWORDS.
+
+    Returns:
+        list of strings: Filtered text.
+    """
+
     result = []
     for word in text:
         if word not in STOPWORDS:
@@ -51,6 +61,15 @@ def remove_stopwords(text):
 
 
 def stem_text(text):
+    """Stems the given (English) text.
+
+    Args:
+        text: List of strings to stem.
+
+    Returns:
+        list of strings: Stemmed text.
+    """
+
     result = []
 
     stemmer = SnowballStemmer("english")
@@ -61,6 +80,15 @@ def stem_text(text):
 
 
 def clean_text(text):
+    """Cleans the given text by stemming it and removing stop words.
+
+    Args:
+        text: List of strings to clean.
+
+    Returns:
+        list of strings: Cleaned text.
+    """
+
     return stem_text(
         remove_stopwords(
             text
@@ -81,6 +109,8 @@ def get_classify_set():
     #   Crawling websites and finding words that relate to it so it can
     #       search those instead or use those as features.
     for category in CATEGORIES:
+        LOGGING.push("Assigning category: @" + category + "@.")
+
         tweets = (
             db.session.query(Tweet).filter(Tweet.text.contains(category)).all()
         )
@@ -88,7 +118,7 @@ def get_classify_set():
         if tweets:
             clean_add(tweets, results, category)
         else:
-            print("No tweets were found for #" + category + "#.")
+            LOGGING.push("No tweets were found for #" + category + "#.")
 
     return results
 
@@ -101,18 +131,26 @@ def assign_features(text):
     return features
 
 
+def tokenize_full(text):
+    sentences = sent_tokenize(text)
+    tokenized = []
+
+    for sentence in sentences:
+        tokenized.extend(word_tokenize(sentence.lower()))
+
+    return tokenized
+
+
+def prepare_text(text):
+    tokenized = tokenize_full(text)
+    return assign_features(clean_text(tokenized))
+
+
 def clean_add(tweets, results, label):
     progress = ProgressBar()
-
     for tweet in progress(tweets):
-        sentences = sent_tokenize(tweet.text)
-        tokenized = []
-
-        for sentence in sentences:
-            tokenized.extend(word_tokenize(sentence.lower()))
-
         results.append((
-            assign_features(clean_text(tokenized)),
+            prepare_text(tweet.text),
             label
         ))
 
@@ -120,19 +158,25 @@ def clean_add(tweets, results, label):
 def classify_tweets():
     """Combines Scikit-Learn and NLTK with a SVM to classify tweets."""
 
-    # For easy training, can just search all tweets with the key word Islam
-    #   And train the set from there. Stemming and eliminating stop words.
+    classifier = get_classifier()
+    tweets = db.session.query(Tweet.text).all()
+    prepared_tweets = []
+
+    progress = ProgressBar()
+    for tweet in progress(tweets):
+        prepared_tweets.append(prepare_text(tweet.text))
+
+    classifier.classify_many(prepared_tweets)
+
+
+def get_classifier():
     classified = get_classify_set()
 
-    # Train the set.
     shuffle(classified)
     test_size = int(len(classified) * .1)
 
     train_set = classified[test_size:]
     test_set = classified[:test_size]
-
-    print("Training set is: " + str(train_set))
-    print("Test set is: " + str(test_set))
 
     # TODO(Use a SVC instead of a LinearSVC for probabilities.)
     classifier = SklearnClassifier(LinearSVC())
@@ -144,12 +188,14 @@ def classify_tweets():
         test_features.append(item[0])
         test_label.append(item[1])
 
-    classified_test = classifier.batch_classify(test_features)
+    classified_test = classifier.classify_many(test_features)
     print(classification_report(
         test_label, classified_test,
         labels=list(set(test_label)),
         target_names=CATEGORIES
     ))
+
+    return classifier
 
 if __name__ == "__main__":
     LOGGING.push("Starting to *classify* tweets.")
