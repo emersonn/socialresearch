@@ -96,8 +96,12 @@ def clean_text(text):
     )
 
 
-def get_classify_set():
+def get_classify_set(categories=CATEGORIES):
     """Returns the classified training set from the database.
+
+    Args:
+        categories: List of categories to consider for classification.
+            All of the categories are strings to match.
 
     Returns:
         List of tuples: (cleaned text, classification)
@@ -124,6 +128,17 @@ def get_classify_set():
 
 
 def assign_features(text):
+    """Assigns features of the given text.
+
+    Args:
+        text: List of strings to assign features to.
+
+    Returns:
+        dictionary: Dictionary of strings to booleans.
+            Strings in the format of features with booleans
+            indicating existence.
+    """
+
     features = {}
     for word in text:
         features['contains({text})'.format(text=word.lower())] = True
@@ -132,6 +147,15 @@ def assign_features(text):
 
 
 def tokenize_full(text):
+    """Tokenizes a text by to words.
+
+    Args:
+        text: A string to tokenize.
+
+    Returns:
+        list of strings: A fully tokenized text.
+    """
+
     sentences = sent_tokenize(text)
     tokenized = []
 
@@ -142,11 +166,34 @@ def tokenize_full(text):
 
 
 def prepare_text(text):
+    """Prepares a text by assigning features to a cleaned version.
+
+    Args:
+        text: A string to prepare.
+
+    Returns:
+        dictionary: Dictionary of strings to booleans indicating the
+            existence of a certain feature.
+    """
+
     tokenized = tokenize_full(text)
     return assign_features(clean_text(tokenized))
 
 
 def clean_add(tweets, results, label):
+    """Adds tweets to the given results list by features and classification.
+
+    Args:
+        tweets: List of Tweet objects.
+        results: List to add into.
+        label: Label to label these tweets as.
+
+    Returns:
+        list: List of tuples with the format (dictionary, category). The
+            dictionary is a mapping from strings to booleans, indicating
+            existence of a certain feature.
+    """
+
     progress = ProgressBar()
     for tweet in progress(tweets):
         results.append((
@@ -170,6 +217,12 @@ def classify_tweets():
 
 
 def get_classifier():
+    """Gets a classifier from the current data available.
+
+    Returns:
+        SKlearnClassifier: Trained classifier from given data.
+    """
+
     classified = get_classify_set()
 
     shuffle(classified)
