@@ -9,3 +9,4 @@ settings.py
 config.py
 private.py
 legacy/
+log_general.txt
