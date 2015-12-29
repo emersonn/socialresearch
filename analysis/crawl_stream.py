@@ -39,7 +39,6 @@ class TweetStreamListener(tweepy.StreamListener):
             "*" + status.user.name + "*: " + LOGGING.clean(status.text)
         )
 
-        # Checks for coordinates and places outside coordinates
         try:
             longitude = status.coordinates['coordinates'][0]
             latitude = status.coordinates['coordinates'][1]
@@ -47,20 +46,23 @@ class TweetStreamListener(tweepy.StreamListener):
             longitude = None
             latitude = None
 
-        # Checks for the place otherwise it is undefined
         try:
             place = status.place.full_name
         except (TypeError, AttributeError):
-            place = "Undefined"
+            place = None
 
         store_tweet = Tweet(
             text=str(status.text.encode('unicode_escape')),
+
             user_id=int(status.user.id_str),
+            screen_name=status.user.screen_name,
+
             number=int(status.id_str),
             created_at=status.created_at,
+
             favorite_count=status.favorite_count,
             retweet_count=status.retweet_count,
-            screen_name=status.user.screen_name,
+
             longitude=longitude,
             latitude=latitude,
             place=place
