@@ -1,91 +1,84 @@
-from sqlalchemy import Table, Column, Integer, String
-from sqlalchemy import DateTime, ForeignKey, Float, BigInteger
-from sqlalchemy.orm import relationship, backref
-
-from sqlalchemy.ext.declarative import declarative_base
-Base = declarative_base()
+from twitter import db
 
 
-class Trend(Base):
+class Trend(db.Model):
     __tablename__ = 'trend'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    stored = Column(DateTime)
-    query = Column(String(400))
-    name = Column(String(400))
+    stored = db.Column(db.DateTime)
+    query = db.Column(db.String(400))
+    name = db.Column(db.String(400))
 
-    place = Column(String(400))
+    place = db.Column(db.String(400))
 
-# TODO: Modify the association table's names
-tag_table = Table(
+# TODO(Modify the association db.Table's names)
+tweet_tag = db.Table(
     'tweet_tag',
-    Base.metadata,
-    Column('tweet_id', Integer, ForeignKey('tweet.id')),
-    Column('tag_id', Integer, ForeignKey('tag.id'))
+    db.Column('tweet_id', db.Integer, db.ForeignKey('tweet.id')),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
 )
 
-word_table = Table(
-    'word_table',
-    Base.metadata,
-    Column('word_id', Integer, ForeignKey('word.id')),
-    Column('tweet_id', Integer, ForeignKey('tweet.id'))
+tweet_word = db.Table(
+    'word_db.Table',
+    db.Column('word_id', db.Integer, db.ForeignKey('word.id')),
+    db.Column('tweet_id', db.Integer, db.ForeignKey('tweet.id'))
 )
 
 
-class Tweet(Base):
+class Tweet(db.Model):
     __tablename__ = 'tweet'
 
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    text = Column(String(1000))
-    user_id = Column(BigInteger)
-    screen_name = Column(String(100))
-    number = Column(BigInteger)
-    created_at = Column(DateTime)
+    text = db.Column(db.String(1000))
+    user_id = db.Column(db.BigInteger)
+    screen_name = db.Column(db.String(100))
+    number = db.Column(db.BigInteger)
+    created_at = db.Column(db.DateTime)
 
-    favorite_count = Column(Integer)
-    retweet_count = Column(Integer)
+    favorite_count = db.Column(db.Integer)
+    retweet_count = db.Column(db.Integer)
 
-    longitude = Column(Float)
-    latitude = Column(Float)
+    longitude = db.Column(db.Float)
+    latitude = db.Column(db.Float)
 
-    trend_id = Column(Integer, ForeignKey('trend.id'))
-    trend = relationship('Trend', backref=backref('tweet', order_by=id))
+    trend_id = db.Column(db.Integer, db.ForeignKey('trend.id'))
+    trend = db.relationship('Trend', backref=db.backref('tweet', order_by=id))
 
-    place = Column(String(400))
+    place = db.Column(db.String(400))
 
     # Literally sentiment of the tweet
-    sentiment_classify = Column(String(10))
-    sentiment_dist = Column(Float)
+    sentiment_classify = db.Column(db.String(10))
+    sentiment_dist = db.Column(db.Float)
 
     # Does the person share any personal information about themselves?
-    personal_classify = Column(String(10))
-    personal_dist = Column(Float)
+    personal_classify = db.Column(db.String(10))
+    personal_dist = db.Column(db.Float)
 
     # Is there a reasonable conversation going on in this tweet?
-    convo_classify = Column(String(10))
-    convo_dist = Column(Float)
+    convo_classify = db.Column(db.String(10))
+    convo_dist = db.Column(db.Float)
 
     # Do you feel like you get to know this person through this tweet?
-    know_classify = Column(String(10))
-    know_dist = Column(Float)
+    know_classify = db.Column(db.String(10))
+    know_dist = db.Column(db.Float)
 
-    analyzed_date = Column(DateTime)
+    analyzed_date = db.Column(db.DateTime)
 
-    tags = relationship('Tag', secondary=tag_table, backref="tweets")
+    tags = db.relationship('Tag', secondary=tweet_tag, backref="tweets")
 
 
-class Tag(Base):
+class Tag(db.Model):
     __tablename__ = "tag"
 
-    id = Column(Integer, primary_key=True)
-    tag = Column(String(100))
+    id = db.Column(db.Integer, primary_key=True)
+    tag = db.Column(db.String(100))
 
 
-class Word(Base):
+class Word(db.Model):
     __tablename__ = "word"
 
-    id = Column(Integer, primary_key=True)
-    word = Column(String(1000))
-    context = relationship('Tweet', secondary=word_table, backref="words")
+    id = db.Column(db.Integer, primary_key=True)
+    word = db.Column(db.String(1000))
+    context = db.relationship('Tweet', secondary=tweet_word, backref="words")
