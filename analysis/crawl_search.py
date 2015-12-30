@@ -14,9 +14,11 @@ import tweepy
 
 from prettylog import PrettyLog
 
-from twitter import app
-
 from twitter.models import Tweet
+
+from analysis.connection import AUTH
+
+API = tweepy.API(AUTH, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 # TODO(Abstract this out.)
 CATEGORIES = [
@@ -25,15 +27,6 @@ CATEGORIES = [
     'Buddhist',
     'None'
 ]
-
-CONSUMER_KEY = app.config['CONSUMER_KEY']
-CONSUMER_SECRET = app.config['CONSUMER_SECRET']
-ACCESS_TOKEN = app.config['ACCESS_TOKEN']
-ACCESS_SECRET = app.config['ACCESS_SECRET']
-
-AUTH = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-AUTH.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
-API = tweepy.API(AUTH, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
 LOGGING = PrettyLog()
 
