@@ -1,6 +1,5 @@
 nltk
 sklearn
-scipy
 progressbar
 nose
 
