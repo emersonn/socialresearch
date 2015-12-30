@@ -23,11 +23,11 @@ CATEGORIES = [
 
 PRESET_TAGS = {
     'Christian': [
-        'God', 'Bible', 'Jesus', 'Jesus Christ', 'Church', 'Amen', 'Baptism',
+        'God', 'Bible', 'Jesus', 'Jesus Christ', 'Amen', 'Baptism',
         'Christ', 'Holy Easter', 'Easter Sunday', 'Holy Spirit'
     ],
     'Muslim': [
-        'Koran', "Quran", "Q'uran", "Allah", "Mosque", 'Allahu Akbar',
+        'Koran', 'Quran', "Q'uran", 'Allah', 'Mosque', 'Allahu Akbar',
         'Ramadan', "Jumu'ah"
     ],
     'Buddhist': [
