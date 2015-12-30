@@ -12,7 +12,6 @@ class Trend(db.Model):
 
     place = db.Column(db.String(400))
 
-# TODO(Modify the association db.Table's names)
 tweet_tag = db.Table(
     'tweet_tag',
     db.Column('tweet_id', db.Integer, db.ForeignKey('tweet.id')),
