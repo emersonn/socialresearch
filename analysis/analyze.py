@@ -10,6 +10,8 @@ from random import shuffle
 
 from string import punctuation
 
+from sqlalchemy import or_
+
 from nltk.classify.scikitlearn import SklearnClassifier
 
 from nltk.corpus import stopwords
@@ -39,6 +41,7 @@ from twitter.models import Tweet
 STOPWORDS = set(stopwords.words('english') + list(punctuation))
 
 CATEGORIES = app.config['CATEGORIES']
+PRESET_TAGS = app.config['PRESET_TAGS']
 
 LOGGING = PrettyLog()
 
@@ -120,9 +123,15 @@ def get_classify_set(categories=CATEGORIES):
         LOGGING.push("Assigning category: @" + category + "@.")
 
         if category != 'None':
+            search = [Tweet.text.contains(category)]
+
+            if category in PRESET_TAGS:
+                for tag in PRESET_TAGS[category]:
+                    search.append(Tweet.text.contains(tag))
+
             tweets = (
                 db.session.query(Tweet)
-                .filter(Tweet.text.contains(category)).all()
+                .filter(or_(*search)).all()
             )
         else:
             # TODO(Should manually do this but very low chance it's religious.)
