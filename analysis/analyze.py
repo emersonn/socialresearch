@@ -20,8 +20,8 @@ from nltk.tokenize import sent_tokenize
 from nltk.tokenize import word_tokenize
 
 from sklearn.metrics import classification_report
-# from sklearn.svm import LinearSVC
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
+# from sklearn.svm import SVC
 
 from progressbar import Bar
 from progressbar import ETA
@@ -120,7 +120,7 @@ def get_classify_set(categories=CATEGORIES):
     #       search those instead or use those as features.
 
     # TODO(Does there need to be a None category? Would it help?)
-    for category in CATEGORIES:
+    for category in categories:
         LOGGING.push("Assigning category: @" + category + "@.")
 
         if category != 'None':
@@ -131,7 +131,7 @@ def get_classify_set(categories=CATEGORIES):
         else:
             # TODO(Should manually do this but very low chance it's religious.)
             tweets = (
-                db.session.query(Tweet).limit(1000).all()
+                db.session.query(Tweet).limit(4000).all()
             )
 
         if tweets:
@@ -224,7 +224,11 @@ def classify_tweets(categories=CATEGORIES):
     classifier = get_classifier()
 
     # TODO(Fix this to the whole database.)
-    tweets = db.session.query(Tweet.text).limit(1000).all()
+    tweets = db.session.query(Tweet.text).all()
+    # tweets = db.session.query(Tweet.text).all()
+    # tweets = (
+    #     db.session.query(Tweet.text).filter(Tweet.text.contains("Christian")).all()
+    # )
     prepared_tweets = []
 
     widgets = [
@@ -237,8 +241,13 @@ def classify_tweets(categories=CATEGORIES):
         prepared_tweets.append(prepare_text(tweet.text))
 
     results = classifier.classify_many(prepared_tweets)
-    probabilities = classifier.prob_classify_many(prepared_tweets)
+    # probabilities = classifier.prob_classify_many(prepared_tweets)
 
+    # TODO(Testing code. REMOVE!)
+    # print(str(results))
+    # print(str(probabilities))
+    # return
+    """
     for i, v in enumerate(zip(results, probabilities)):
         if str(v[0]) != 'None':
             print(tweets[i].text)
@@ -246,6 +255,12 @@ def classify_tweets(categories=CATEGORIES):
 
             for category in categories:
                 print(category + " : " + str(v[1].prob(category)))
+    """
+
+    for i, v in enumerate(results):
+        if v != 'None':
+            LOGGING.push("*Tweet*: " + LOGGING.clean(tweets[i].text))
+            LOGGING.push('Classified as: @' + v + '@.')
 
 
 def get_classifier():
@@ -265,7 +280,8 @@ def get_classifier():
 
     # TODO(Use a SVC instead of a LinearSVC for probabilities.)
     # TODO(Is there an advantage of LinearSVC?)
-    classifier = SklearnClassifier(SVC(probability=True))
+    classifier = SklearnClassifier(LinearSVC())
+    # classifier = SklearnClassifier(SVC(probability=True))
     classifier.train(train_set)
 
     # TODO(Make this into a neater lambda function.)
@@ -277,8 +293,8 @@ def get_classifier():
     classified_test = classifier.classify_many(test_features)
     print(classification_report(
         test_label, classified_test,
-        # label=list(set(test_label)),
-        # target_names=CATEGORIES
+        labels=list(set(test_label)),
+        target_names=CATEGORIES
     ))
 
     return classifier
