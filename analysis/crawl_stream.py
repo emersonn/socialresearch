@@ -13,7 +13,6 @@ from prettylog import PrettyLog
 
 # TODO(Consider separating both of these modules? Too interlinked?)
 from twitter import app
-from twitter import db
 
 from twitter.models import Tweet
 
@@ -42,42 +41,12 @@ class TweetStreamListener(tweepy.StreamListener):
             "*" + status.user.name + "*: " + LOGGING.clean(status.text)
         )
 
-        self.num_tweets += 1
-
         try:
-            longitude = status.coordinates['coordinates'][0]
-            latitude = status.coordinates['coordinates'][1]
-        except TypeError:
-            longitude = None
-            latitude = None
-
-        try:
-            place = status.place.full_name
-        except (TypeError, AttributeError):
-            place = None
-
-        try:
-            store_tweet = Tweet(
-                text=str(status.text.encode('unicode_escape')),
-
-                user_id=int(status.user.id_str),
-                screen_name=status.user.screen_name,
-
-                number=int(status.id_str),
-                created_at=status.created_at,
-
-                favorite_count=status.favorite_count,
-                retweet_count=status.retweet_count,
-
-                longitude=longitude,
-                latitude=latitude,
-                place=place
-            )
-
-            db.session.add(store_tweet)
-            db.session.commit()
+            Tweet.store_tweet(status)
         except DataError:
             LOGGING.push("Tweet too long, skipping.")
+
+        self.num_tweets += 1
 
         if self.num_tweets % 100 == 0:
             LOGGING.push(
