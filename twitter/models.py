@@ -32,8 +32,7 @@ class Tweet(db.Model):
 
     text = db.Column(db.String(1000))
 
-    # TODO(Need to store tweet id to make it unique.)
-    # tweet_id = db.Column(db.BigInteger, unique=True)
+    tweet_id = db.Column(db.BigInteger, unique=True)
 
     user_id = db.Column(db.BigInteger)
     screen_name = db.Column(db.String(100))
@@ -88,6 +87,7 @@ class Tweet(db.Model):
         store_tweet = Tweet(
             text=str(status.text.encode('unicode_escape')),
 
+            tweet_id=status.id,
             user_id=int(status.user.id_str),
             screen_name=status.user.screen_name,
 

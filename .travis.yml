@@ -11,4 +11,5 @@ install:
   - pip install -r requirements.txt
   - mv twitter/app_settings.py.default twitter/app_settings.py
   - python -m nltk.downloader stopwords
+  - python -m nltk.downloader punkt
 script: nosetests
