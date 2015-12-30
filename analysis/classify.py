@@ -1,57 +1,71 @@
 from sys import exit
 
-from colorama import Fore
+from prettylog import PrettyLog
 
-from config import CLASSIFICATIONS
-from ..database import db_session
+from twitter import db
 
-# TODO: Change to specific imports
-import models
+from twitter.models import Tweet
+
+# TODO(Abstract this out into a settings file.)
+CLASSIFICATIONS = ['sentiment', 'personal', 'convo', 'know']
+
+CLASSIFICATION_CATEGORIES = {
+    'sentiment': ['pos', 'neg', 'no']
+}
+
+CLASSIFICATION_SUFFIX = "_classify"
+
+LOGGING = PrettyLog()
 
 
 def classify(classification):
-    current = classification + "_classify"
+    model_attr = classification + CLASSIFICATION_SUFFIX
 
-    # TODO: Add pagination for infinite classification until exit
+    choices = ""
+    for i, choice in enumerate(CLASSIFICATION_CATEGORIES[classification]):
+        choices += ", " if i > 0 else ""
+        choices += str(i + 1) + " = " + choice
+
+    # TODO(Add pagination for infinite classification until exit.)
     response = (
-        db_session.query(models.Tweet)
-        .filter_by(**{current: None})
+        db.session.query(Tweet)
+        .filter_by(**{model_attr: None})
         .limit(100)
     )
 
     for row in response:
-        print(
-            Fore.BLUE + "The tweet (" + str(row.id) + "): " + Fore.RESET +
-            row.text.decode('unicode-escape')
+        LOGGING.push(
+            "*" + str(row.tweet_id) + "*: " +
+            LOGGING.clean(row.text.decode('unicode-escape'))
         )
 
-        print(
-            "You are classifying the " +
-            Fore.RED + classification + Fore.RESET + "."
+        LOGGING.push(
+            "Currently classifying the @" + classification + "@."
         )
 
         user = raw_input(
-            "Classification? (pos = 1, neg = 2, no = 3) (exit to exit) "
+            "Classification? (" + choices
+            + ") (exit to exit) "
         )
 
         if user == "exit":
             exit()
 
-        if (user != "1" and user != "2" and user != "3"):
-            print("Was not pos or negative, going to next...")
+        user = int(user) - 1
+
+        if user not in range(
+            len(CLASSIFICATION_CATEGORIES[classification])
+        ):
+            print("Was not any of the choices, going to the next tweet.")
             continue
 
-        if user == "1":
-            user = "pos"
-        elif user == "2":
-            user = "neg"
-        elif user == "3":
-            user = "no"
+        user = CLASSIFICATION_CATEGORIES[classification][user]
+        setattr(row, model_attr, user)
 
-        setattr(row, current, user)
-        db_session.commit()
+        db.session.add(row)
+        db.session.commit()
 
-        print("Classified as " + Fore.RED + user + Fore.RESET + ".")
+        LOGGING.push("Classified as *" + user + "*.")
 
 if __name__ == "__main__":
     classification = raw_input(
