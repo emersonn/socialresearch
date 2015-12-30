@@ -1,0 +1,6 @@
+nltk
+sklearn
+progressbar
+nose
+
+-e git://github.com/emersonn/prettylog.git#egg=prettylog
