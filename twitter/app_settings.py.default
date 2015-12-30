@@ -20,3 +20,18 @@ CATEGORIES = [
     'Buddhist',
     'None'
 ]
+
+PRESET_TAGS = {
+    'Christian': [
+        'God', 'Bible', 'Jesus', 'Jesus Christ', 'Church', 'Amen', 'Baptism',
+        'Christ', 'Holy Easter', 'Easter Sunday', 'Holy Spirit'
+    ],
+    'Muslim': [
+        'Koran', "Quran", "Q'uran", "Allah", "Mosque", 'Allahu Akbar',
+        'Ramadan', "Jumu'ah"
+    ],
+    'Buddhist': [
+        'Arahat', 'asura', 'Buddha', 'dharma', 'four noble truths',
+        'mantra', 'nirvana', 'Tao'
+    ]
+}
