@@ -8,13 +8,12 @@ Tweets that match.
 
 import time
 
-from sqlalchemy.exc import DataError
-
 import tweepy
 
 from prettylog import PrettyLog
 
 from twitter import app
+from twitter import db
 
 from twitter.models import Tweet
 
@@ -69,14 +68,15 @@ def crawl_category(category):
     )
 
     for status in cursor:
-        LOGGING.push(
-            "*" + status.user.name + "*: " + LOGGING.clean(status.text)
-        )
+        if (
+            db.session.query(Tweet).filter(tweet_id=status.id).count() == 0 and
+            len(status.text) < 1000
+        ):
+            LOGGING.push(
+                "*" + status.user.name + "*: " + LOGGING.clean(status.text)
+            )
 
-        try:
             Tweet.store_tweet(status)
-        except DataError:
-            LOGGING.push("Tweet too long, skipping.")
 
 
 def crawl_search():
