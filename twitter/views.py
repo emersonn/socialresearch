@@ -9,7 +9,7 @@ from twitter import app
 from twitter import db
 
 # TODO(Pull this out into somewhere else.)
-from twitter.config import PRESET_TAGS
+# from twitter.config import PRESET_TAGS
 
 from twitter.models import Tag
 from twitter.models import Tweet
