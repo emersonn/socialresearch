@@ -30,6 +30,7 @@ from progressbar import ProgressBar
 
 from prettylog import PrettyLog
 
+from twitter import app
 from twitter import db
 
 from twitter.models import Tweet
@@ -37,12 +38,7 @@ from twitter.models import Tweet
 # TODO(Improve this search for stop words.)
 STOPWORDS = set(stopwords.words('english') + list(punctuation))
 
-CATEGORIES = [
-    'Christian',
-    'Muslim',
-    'Buddhist',
-    'None'
-]
+CATEGORIES = app.config['CATEGORIES']
 
 LOGGING = PrettyLog()
 

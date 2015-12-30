@@ -14,19 +14,15 @@ import tweepy
 
 from prettylog import PrettyLog
 
+from twitter import app
+
 from twitter.models import Tweet
 
 from analysis.connection import AUTH
 
 API = tweepy.API(AUTH, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
-# TODO(Abstract this out.)
-CATEGORIES = [
-    'Christian',
-    'Muslim',
-    'Buddhist',
-    'None'
-]
+CATEGORIES = app.config['CATEGORIES']
 
 LOGGING = PrettyLog()
 
