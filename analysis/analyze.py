@@ -136,7 +136,7 @@ def get_classify_set(categories=CATEGORIES):
         else:
             # TODO(Should manually do this but very low chance it's religious.)
             tweets = (
-                db.session.query(Tweet).limit(4000).all()
+                db.session.query(Tweet).limit(400).all()
             )
 
         if tweets:
