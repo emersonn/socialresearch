@@ -32,6 +32,10 @@ class Tweet(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     text = db.Column(db.String(1000))
+
+    # TODO(Need to store tweet id to make it unique.)
+    # tweet_id = db.Column(db.BigInteger, unique=True)
+
     user_id = db.Column(db.BigInteger)
     screen_name = db.Column(db.String(100))
     number = db.Column(db.BigInteger)
