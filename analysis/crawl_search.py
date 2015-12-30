@@ -39,9 +39,18 @@ LOGGING = PrettyLog()
 
 
 def limit_handled(cursor):
+    """Limits the cursor's accesses with respect to the rate limit.
+
+    Args:
+        cursor: Cursor to limit.
+
+    Notes:
+        Once the rate limit is reached, program execution waits 15 minutes.
+    """
+
     while True:
         """
-        remaining = int(API.last_response.getheader('x-rate-limi-remaining'))
+        remaining = int(API.last_response.getheader('x-rate-limit-remaining'))
         if remaining == 0:
             # limit = int(API.last_response.getheader('x-rate-limit-limit'))
 
@@ -61,6 +70,11 @@ def limit_handled(cursor):
 
 
 def crawl_category(category):
+    """Crawls a specific given category.
+
+    Args:
+        category: Category to search for.
+    """
     cursor = limit_handled(
         tweepy.Cursor(API.search, q=category, count=100).items(1000)
     )
@@ -77,6 +91,8 @@ def crawl_category(category):
 
 
 def crawl_search():
+    """Crawls the search."""
+
     for category in CATEGORIES:
         crawl_category(category)
 
