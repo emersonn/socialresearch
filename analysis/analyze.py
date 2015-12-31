@@ -14,7 +14,11 @@ from sqlalchemy import or_
 
 from nltk.classify.scikitlearn import SklearnClassifier
 
+from nltk.collocations import BigramCollocationFinder
+
 from nltk.corpus import stopwords
+
+from nltk.metrics import BigramAssocMeasures
 
 from nltk.stem.snowball import SnowballStemmer
 
@@ -162,6 +166,16 @@ def assign_features(text):
     features = {}
     for word in text:
         features['contains({text})'.format(text=word.lower())] = True
+
+    bigram_finder = BigramCollocationFinder.from_words(text)
+    bigram_finder.apply_freq_filter(3)
+
+    try:
+        bigrams = bigram_finder.nbest(BigramAssocMeasures.chi_sq, 120)
+        for bigram in bigrams:
+            features['bigram({bigram})'.format(bigram=str(bigram))] = True
+    except ZeroDivisionError:
+        pass
 
     return features
 
