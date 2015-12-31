@@ -30,7 +30,6 @@ PRESET_TAGS = {
         "Jumu'ah"
     ],
     'Buddhist': [
-        'Arahat', 'asura', 'Buddha', 'dharma', 'four noble truths',
-        'mantra', 'nirvana', 'Tao'
+        'Arahat', 'dharma', 'four noble truths', 'Tao'
     ]
 }
