@@ -63,14 +63,18 @@ def crawl_category(category):
     Args:
         category: Category to search for.
     """
+
     cursor = limit_handled(
         tweepy.Cursor(API.search, q=category, count=100).items(1000)
     )
 
     for status in cursor:
         if (
-            db.session.query(Tweet).filter(tweet_id=status.id).count() == 0 and
-            len(status.text) < 1000
+            db.session.query(Tweet).filter_by(
+                tweet_id=status.id
+            ).count() == 0 and
+            # TODO(Need to encode this into unicode.)
+            len(str(status.text.encode('unicode_escape'))) < 1000
         ):
             LOGGING.push(
                 "*" + status.user.name + "*: " + LOGGING.clean(status.text)
