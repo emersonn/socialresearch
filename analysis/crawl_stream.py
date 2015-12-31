@@ -5,11 +5,11 @@ Emerson Matson
 Collects tweets from the Twitter sample stream.
 """
 
-from sqlalchemy.exc import DataError
-
 import tweepy
 
 from prettylog import PrettyLog
+
+from twitter import db
 
 from twitter.models import Tweet
 
@@ -27,21 +27,26 @@ class TweetStreamListener(tweepy.StreamListener):
         LOGGING.push("Successfully connected to Twitter streaming API.")
 
     def on_status(self, status):
-        LOGGING.push(
-            "*" + status.user.name + "*: " + LOGGING.clean(status.text)
-        )
-
-        try:
-            Tweet.store_tweet(status)
-        except DataError:
-            LOGGING.push("Tweet too long, skipping.")
-
-        self.num_tweets += 1
-
-        if self.num_tweets % 100 == 0:
+        if (
+            db.session.query(Tweet).filter_by(
+                tweet_id=status.id
+            ).count() == 0 and
+            # TODO(Need to encode this into unicode.)
+            len(str(status.text.encode('unicode_escape'))) < 1000
+        ):
             LOGGING.push(
-                "*" + str(self.num_tweets) + "* tweets have been collected."
+                "*" + status.user.name + "*: " + LOGGING.clean(status.text)
             )
+
+            Tweet.store_tweet(status)
+
+            self.num_tweets += 1
+
+            if self.num_tweets % 100 == 0:
+                LOGGING.push(
+                    "*" + str(self.num_tweets) +
+                    "* tweets have been collected."
+                )
 
     def on_error(self, status_code):
         LOGGING.push(
