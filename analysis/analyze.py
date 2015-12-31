@@ -140,7 +140,7 @@ def get_classify_set(categories=CATEGORIES):
         else:
             # TODO(Should manually do this but very low chance it's religious.)
             tweets = (
-                db.session.query(Tweet).limit(400).all()
+                db.session.query(Tweet).limit(300).all()
             )
 
         if tweets:
@@ -171,7 +171,7 @@ def assign_features(text):
     bigram_finder.apply_freq_filter(3)
 
     try:
-        bigrams = bigram_finder.nbest(BigramAssocMeasures.chi_sq, 120)
+        bigrams = bigram_finder.nbest(BigramAssocMeasures.chi_sq, 10)
         for bigram in bigrams:
             features['bigram({bigram})'.format(bigram=str(bigram))] = True
     except ZeroDivisionError:
@@ -316,9 +316,20 @@ def get_classifier():
         target_names=CATEGORIES
     ))
 
+    # TODO(Print most informative features.)
+
     return classifier
 
 if __name__ == "__main__":
-    LOGGING.push("Starting to *classify* tweets.")
-    classify_tweets()
-    LOGGING.push("Finished *classifying* tweets.")
+    choice = raw_input(
+        "(1) I want to make a classifier report. (2) Classify my tweets. "
+    )
+    choice = int(choice)
+
+    if choice == 1:
+        LOGGING.push("Making classifier.")
+        get_classifier()
+    elif choice == 2:
+        LOGGING.push("Starting to *classify* tweets.")
+        classify_tweets()
+        LOGGING.push("Finished *classifying* tweets.")
